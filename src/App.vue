@@ -66,7 +66,7 @@ const hardReset = () => {
 <template>
     <div
         :class="
-            'size-full flex flex-col justify-center items-center text-main-white font-arial gap-4 transition-all duration-[0.75s] ease-in-out ' +
+            'size-full flex flex-col justify-center items-center text-main-white font-Nunito gap-4 transition-all duration-[0.75s] ease-in-out ' +
             (focusState ? 'bg-main-red' : 'bg-main-blue')
         "
     >
@@ -82,7 +82,7 @@ const hardReset = () => {
             class="border-4 border-solid rounded-xl border-main-white w-auto h-auto p-8 flex flex-col gap-2 items-center"
         >
             <h1 class="font-bold text-4xl">
-                {{ focusState ? 'Focus' : 'Break' }}
+                {{ focusState ? 'Focus Mode' : 'Take a Break' }}
             </h1>
             <p class="text-8xl font-medium">{{ time }}</p>
         </div>

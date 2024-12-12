@@ -9,7 +9,7 @@ export default {
                 'main-blue': '#56A3A6',
             },
             fontFamily: {
-                arial: ['Arial', 'sans-serif'],
+                Nunito: ['Nunito', 'Arial', 'serif'],
             },
         },
     },
