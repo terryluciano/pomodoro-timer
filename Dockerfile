@@ -1,10 +1,15 @@
-FROM node:20-alpine
+FROM node:20-alpine AS build
 
-COPY package.json .
-COPY package-lock.json .
+COPY . .
 
 RUN npm install
 
-EXPOSE 8080
+RUN npm run build
 
-CMD ["npm", "run", "dev"]
+FROM nginx
+
+COPY --from=build ./dist /usr/share/nginx/html
+
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]
