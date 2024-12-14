@@ -4,14 +4,14 @@ I created this project to practice Vue.js and run the app locally on my network 
 
 ___
 
-## Prerequisites
+### Prerequisites
 
 - Node.js (v20.x)
 - NPM (v10.x)
 
 ___
 
-## Tech Stack
+### Tech Stack
 
 - Vue.js
 - Vite
@@ -20,13 +20,13 @@ ___
 
 ___
 
-## Installation
+### Installation
 
 ```bash
 npm install
 ```
 
-## Usage
+### Usage
 
 ```bash
 npm run dev
