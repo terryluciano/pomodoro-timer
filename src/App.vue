@@ -1,135 +1,179 @@
 <script setup>
-import { ref, watch, onMounted, computed, watchEffect } from 'vue'
-import { twMerge } from 'tailwind-merge'
-import Button from './components/Button.vue'
-import clickSound from './assets/click.mp3'
-import chimeSound from './assets/chime.mp3'
+import { ref, watch, onMounted, computed } from 'vue';
+import { Howl } from 'howler';
+import { twMerge } from 'tailwind-merge';
+import Button from './components/Button.vue';
+import clickSound from './assets/click.mp3';
+import chimeSound from './assets/chime.mp3';
+
+let click, chime;
+
+const initializeAudio = () => {
+    // Only create these after a user clicks on something
+    click = new Howl({
+        src: [clickSound],
+        volume: 0.5,
+        loop: false,
+    });
+
+    chime = new Howl({
+        src: [chimeSound],
+        volume: 0.5,
+        loop: false,
+    });
+};
 
 const playClick = () => {
-    const click = document.getElementById('click')
-    click.play()
-}
+    click?.play();
+};
 
 const playChime = () => {
-    const chime = document.getElementById('chime')
-    chime.play()
-}
+    chime?.play();
+};
 
-const time = ref(1000 * 60 * 25)
-const focusState = ref(true)
-const workCount = ref(1)
-const breakCount = ref(0)
+let startTime;
 
-let timerInterval
+const time = ref(1000 * 60 * 25);
+const timerState = ref(false);
+const focusState = ref(true);
+const workCount = ref(1);
+const breakCount = ref(0);
 
 watch(focusState, (state) => {
-    localStorage.setItem('focusState', state)
-})
+    localStorage.setItem('focusState', state);
+});
 
 watch(workCount, (state) => {
-    localStorage.setItem('workCount', state)
-})
+    localStorage.setItem('workCount', state);
+});
 
 watch(breakCount, (state) => {
     if (breakCount.value > 0 && breakCount.value % 4 == 0 && !focusState) {
-        time.value = 1000 * 60 * 15
+        time.value = 1000 * 60 * 15;
     }
-    localStorage.setItem('breakCount', state)
-})
+    localStorage.setItem('breakCount', state);
+});
 
 const startTimer = () => {
-    playClick()
-    timerInterval = setInterval(() => {
-        time.value -= 1000
-        if (time.value <= 0) {
-            clearInterval(timerInterval)
-            playChime()
+    initializeAudio();
+    playClick();
+    timerState.value = true;
+    updateTime();
+    startTime = undefined;
+};
+
+const updateTime = (timestamp) => {
+    if (!startTime) {
+        startTime = timestamp;
+    }
+    if (!timestamp) {
+        requestAnimationFrame(updateTime);
+        return;
+    }
+
+    time.value -= timestamp - startTime;
+    startTime = timestamp;
+
+    if (timerState.value) {
+        if (time.value > 0) {
+            requestAnimationFrame(updateTime);
+        } else {
+            playChime();
             if (focusState.value) {
-                focusState.value = false
-                breakCount.value++
+                focusState.value = false;
+                breakCount.value++;
                 time.value =
-                    breakCount.value % 4 == 0 ? 1000 * 60 * 15 : 1000 * 60 * 5
+                    breakCount.value % 4 == 0 ? 1000 * 60 * 15 : 1000 * 60 * 5;
             } else {
-                focusState.value = true
-                workCount.value++
-                time.value = 1000 * 60 * 25
+                focusState.value = true;
+                workCount.value++;
+                time.value = 1000 * 60 * 25;
             }
         }
-    }, 1000)
-}
+    }
+};
 
 const pauseTimer = () => {
-    playClick()
-    clearInterval(timerInterval)
-}
+    playClick();
+    timerState.value = false;
+    startTime = undefined;
+};
 
 const resetTimer = () => {
-    clearInterval(timerInterval)
+    timerState.value = false;
+    startTime = undefined;
     time.value = focusState.value
         ? 1000 * 60 * 25
         : breakCount.value % 4 == 0
           ? 1000 * 60 * 15
-          : 1000 * 60 * 5
-}
+          : 1000 * 60 * 5;
+};
 
 onMounted(() => {
     // get focus state
-    const storedFocusState = localStorage.getItem('focusState')
+    const storedFocusState = localStorage.getItem('focusState');
     if (storedFocusState) {
-        const boolState = storedFocusState == 'true'
-        focusState.value = boolState
-        time.value = boolState ? 1000 * 60 * 25 : 1000 * 60 * 5
+        const boolState = storedFocusState == 'true';
+        focusState.value = boolState;
+        // time.value = boolState ? 1000 * 60 * 25 : 1000 * 60 * 5;
     }
 
     // get work count
-    const storedWorkCount = localStorage.getItem('workCount')
+    const storedWorkCount = localStorage.getItem('workCount');
     if (storedWorkCount) {
-        workCount.value = Number(storedWorkCount)
+        workCount.value = Number(storedWorkCount);
     }
 
     // get break count
-    const storedBreakCount = localStorage.getItem('breakCount')
+    const storedBreakCount = localStorage.getItem('breakCount');
     if (storedBreakCount) {
-        breakCount.value = Number(storedBreakCount)
+        breakCount.value = Number(storedBreakCount);
     }
-})
+});
 
 const handleFocusButtonClick = () => {
     if (!focusState.value) {
-        playClick()
-        workCount.value++
-        focusState.value = true
-        clearInterval(timerInterval)
-        time.value = 1000 * 60 * 25
+        playClick();
+        workCount.value++;
+        focusState.value = true;
+        timerState.value = false;
+        startTime = undefined;
+        time.value = 1000 * 60 * 25;
     }
-}
+};
 
 const handleBreakButtonClick = () => {
     if (focusState.value) {
-        playClick()
-        breakCount.value++
-        focusState.value = false
-        clearInterval(timerInterval)
-        time.value = 1000 * 60 * 5
+        playClick();
+        breakCount.value++;
+        focusState.value = false;
+        timerState.value = false;
+        startTime = undefined;
+        time.value = 1000 * 60 * 5;
     }
-}
+};
 
 const hardReset = () => {
-    playClick()
-    localStorage.clear()
-    focusState.value = true
-    workCount.value = 1
-    breakCount.value = 0
-    resetTimer()
-}
+    playClick();
+    localStorage.clear();
+    focusState.value = true;
+    workCount.value = 1;
+    breakCount.value = 0;
+    startTime = undefined;
+    resetTimer();
+};
 
 const currentTime = computed(() => {
-    return `${Math.floor(time.value / 1000 / 60)
+    const formattedTime = `${Math.floor(time.value / 1000 / 60)
         .toString()
         .padStart(2, '0')}:${(Math.floor(time.value / 1000) % 60)
         .toString()
-        .padStart(2, '0')}`
-})
+        .padStart(2, '0')}`;
+
+    document.title = `${formattedTime} - ${focusState.value ? 'Focus' : 'Break'} Mode`;
+
+    return formattedTime;
+});
 </script>
 
 <template>
@@ -166,13 +210,6 @@ const currentTime = computed(() => {
             <Button :isActive="false" :onClick="startTimer">Start</Button>
             <Button :isActive="false" :onClick="pauseTimer">Pause</Button>
         </div>
-
-        <audio id="click" preload="auto">
-            <source type="audio/mpeg" :src="clickSound" />
-        </audio>
-        <audio id="chime" preload="auto">
-            <source type="audio/mpeg" :src="chimeSound" />
-        </audio>
 
         <Button
             class="absolute bottom-16 left-1/2 -translate-x-1/2"
