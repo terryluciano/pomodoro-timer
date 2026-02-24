@@ -1,26 +1,44 @@
 <script setup>
-import { ref, watch, onMounted, computed } from 'vue';
 import { Howl } from 'howler';
 import { twMerge } from 'tailwind-merge';
-import Button from './components/Button.vue';
-import clickSound from './assets/click.mp3';
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 import chimeSound from './assets/chime.mp3';
+import clickSound from './assets/click.mp3';
+import settingsIcon from './assets/settings.svg';
+import Button from './components/Button.vue';
+
+const WORK_TIME = 1000 * 60 * 25;
+const SHORT_BREAK_TIME = 1000 * 60 * 5;
+const LONG_BREAK_TIME = 1000 * 60 * 15;
+
+const remainingTime = ref(WORK_TIME);
+
+const timerState = ref(false);
+const focusState = ref(true);
+
+const workCount = ref(1);
+const breakCount = ref(0);
 
 let click, chime;
 
-const initializeAudio = () => {
-    // Only create these after a user clicks on something
-    click = new Howl({
-        src: [clickSound],
-        volume: 0.5,
-        loop: false,
-    });
+let intervalId = null;
+let endTime = null;
 
-    chime = new Howl({
-        src: [chimeSound],
-        volume: 0.5,
-        loop: false,
-    });
+const initializeAudio = () => {
+    if (!click) {
+        click = new Howl({
+            src: [clickSound],
+            volume: 0.5,
+            loop: false,
+        });
+    }
+    if (!chime) {
+        chime = new Howl({
+            src: [chimeSound],
+            volume: 0.5,
+            loop: false,
+        });
+    }
 };
 
 const playClick = () => {
@@ -31,13 +49,75 @@ const playChime = () => {
     chime?.play();
 };
 
-let startTime;
+const getDefaultTime = () => {
+    if (focusState.value) {
+        return WORK_TIME;
+    }
+    return breakCount.value > 0 && breakCount.value % 4 === 0
+        ? LONG_BREAK_TIME
+        : SHORT_BREAK_TIME;
+};
 
-const time = ref(1000 * 60 * 25);
-const timerState = ref(false);
-const focusState = ref(true);
-const workCount = ref(1);
-const breakCount = ref(0);
+const updateTimer = () => {
+    if (!endTime || !timerState.value) return;
+
+    const now = Date.now();
+    remainingTime.value = Math.max(0, endTime - now);
+
+    if (remainingTime.value <= 0) {
+        handleTimerComplete();
+    }
+};
+
+const handleTimerComplete = () => {
+    playChime();
+    stopTimer();
+
+    if (focusState.value) {
+        focusState.value = false;
+        breakCount.value++;
+    } else {
+        focusState.value = true;
+        workCount.value++;
+    }
+
+    remainingTime.value = getDefaultTime();
+};
+
+const startTimer = () => {
+    playClick();
+
+    if (remainingTime.value <= 0) {
+        remainingTime.value = getDefaultTime();
+    }
+
+    endTime = Date.now() + remainingTime.value;
+    timerState.value = true;
+
+    if (intervalId) clearInterval(intervalId);
+    intervalId = setInterval(updateTimer, 100);
+    updateTimer();
+};
+
+const pauseTimer = () => {
+    playClick();
+    stopTimer();
+};
+
+const stopTimer = () => {
+    timerState.value = false;
+    if (intervalId) {
+        clearInterval(intervalId);
+        intervalId = null;
+    }
+    endTime = null;
+};
+
+const handleVisibilityChange = () => {
+    if (document.visibilityState === 'visible' && timerState.value) {
+        updateTimer();
+    }
+};
 
 watch(focusState, (state) => {
     localStorage.setItem('focusState', state);
@@ -48,131 +128,88 @@ watch(workCount, (state) => {
 });
 
 watch(breakCount, (state) => {
-    if (breakCount.value > 0 && breakCount.value % 4 == 0 && !focusState) {
-        time.value = 1000 * 60 * 15;
-    }
     localStorage.setItem('breakCount', state);
 });
 
-const startTimer = () => {
-    initializeAudio();
-    playClick();
-    timerState.value = true;
-    updateTime();
-    startTime = undefined;
-};
-
-const updateTime = (timestamp) => {
-    if (!startTime) {
-        startTime = timestamp;
-    }
-    if (!timestamp) {
-        requestAnimationFrame(updateTime);
-        return;
-    }
-
-    time.value -= timestamp - startTime;
-    startTime = timestamp;
-
-    if (timerState.value) {
-        if (time.value > 0) {
-            requestAnimationFrame(updateTime);
-        } else {
-            playChime();
-            if (focusState.value) {
-                focusState.value = false;
-                breakCount.value++;
-                time.value =
-                    breakCount.value % 4 == 0 ? 1000 * 60 * 15 : 1000 * 60 * 5;
-            } else {
-                focusState.value = true;
-                workCount.value++;
-                time.value = 1000 * 60 * 25;
-            }
-        }
-    }
-};
-
-const pauseTimer = () => {
-    playClick();
-    timerState.value = false;
-    startTime = undefined;
-};
-
-const resetTimer = () => {
-    timerState.value = false;
-    startTime = undefined;
-    time.value = focusState.value
-        ? 1000 * 60 * 25
-        : breakCount.value % 4 == 0
-          ? 1000 * 60 * 15
-          : 1000 * 60 * 5;
-};
+watch(remainingTime, (state) => {
+    localStorage.setItem('remainingTime', state);
+});
 
 onMounted(() => {
-    // get focus state
+    initializeAudio();
+
     const storedFocusState = localStorage.getItem('focusState');
     if (storedFocusState) {
-        const boolState = storedFocusState == 'true';
-        focusState.value = boolState;
-        // time.value = boolState ? 1000 * 60 * 25 : 1000 * 60 * 5;
+        focusState.value = storedFocusState === 'true';
     }
 
-    // get work count
     const storedWorkCount = localStorage.getItem('workCount');
     if (storedWorkCount) {
         workCount.value = Number(storedWorkCount);
     }
 
-    // get break count
     const storedBreakCount = localStorage.getItem('breakCount');
     if (storedBreakCount) {
         breakCount.value = Number(storedBreakCount);
     }
+
+    const storedRemainingTime = localStorage.getItem('remainingTime');
+    if (storedRemainingTime) {
+        remainingTime.value = Number(storedRemainingTime);
+    } else {
+        remainingTime.value = getDefaultTime();
+    }
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+});
+
+onUnmounted(() => {
+    if (intervalId) clearInterval(intervalId);
+    document.removeEventListener('visibilitychange', handleVisibilityChange);
 });
 
 const handleFocusButtonClick = () => {
     if (!focusState.value) {
         playClick();
+        stopTimer();
         workCount.value++;
         focusState.value = true;
-        timerState.value = false;
-        startTime = undefined;
-        time.value = 1000 * 60 * 25;
+        remainingTime.value = WORK_TIME;
     }
 };
 
 const handleBreakButtonClick = () => {
     if (focusState.value) {
         playClick();
+        stopTimer();
         breakCount.value++;
         focusState.value = false;
-        timerState.value = false;
-        startTime = undefined;
-        time.value = 1000 * 60 * 5;
+        remainingTime.value = SHORT_BREAK_TIME;
     }
 };
 
 const hardReset = () => {
     playClick();
     localStorage.clear();
+    stopTimer();
     focusState.value = true;
     workCount.value = 1;
     breakCount.value = 0;
-    startTime = undefined;
-    resetTimer();
+    remainingTime.value = WORK_TIME;
 };
 
 const currentTime = computed(() => {
-    const formattedTime = `${Math.floor(time.value / 1000 / 60)
-        .toString()
-        .padStart(2, '0')}:${(Math.floor(time.value / 1000) % 60)
-        .toString()
-        .padStart(2, '0')}`;
+    const minutes = Math.floor(remainingTime.value / 1000 / 60);
+    const seconds = Math.floor(remainingTime.value / 1000) % 60;
+    const formattedTime = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
 
     document.title = `${formattedTime} - ${focusState.value ? 'Focus' : 'Break'} Mode`;
 
     return formattedTime;
+});
+
+const countText = computed(() => {
+    return `${focusState.value ? 'Focus' : 'Break'} Count: #${focusState.value ? workCount.value : breakCount.value}`;
 });
 </script>
 
@@ -180,44 +217,61 @@ const currentTime = computed(() => {
     <div
         :class="
             twMerge(
-                'relative size-full flex flex-col xs:justify-center items-center xs:py-10 py-16 text-main-white font-Nunito gap-4 transition-all duration-[0.75s] ease-in-out',
-                `${focusState ? 'bg-main-red' : 'bg-main-blue'}`
+                'relative size-full flex flex-col justify-center items-center xs:py-10 py-16 text-main-white font-Nunito transition-all duration-[0.75s] ease-in-out',
+                focusState ? 'bg-main-focus' : 'bg-main-break'
             )
         "
     >
-        <div class="flex flex-row gap-4 items-center">
-            <Button :isActive="focusState" :onClick="handleFocusButtonClick">
-                Focus Mode
-            </Button>
-            <Button :isActive="!focusState" :onClick="handleBreakButtonClick">
-                Take A Break
-            </Button>
-        </div>
         <div
-            class="border-4 border-solid rounded-xl border-main-white w-auto h-auto p-8 flex flex-col gap-2 items-center"
+            class="relative flex flex-col xs:justify-center items-center xs:py-10 py-16 max-w-96 gap-4 h-full"
         >
-            <h1 class="font-bold text-4xl">
-                {{ focusState ? 'Focus Mode' : 'Take a Break' }}
-            </h1>
-            <p class="text-8xl font-medium">{{ currentTime }}</p>
-        </div>
-        <p>
-            {{ focusState ? 'Focus' : 'Break' }} Count: #{{
-                focusState ? workCount : breakCount
-            }}
-        </p>
-        <div class="flex flex-row gap-4 items-center">
-            <Button :isActive="false" :onClick="startTimer">Start</Button>
-            <Button :isActive="false" :onClick="pauseTimer">Pause</Button>
-        </div>
+            <p class="text-white/80 font-semibold text-lg">
+                {{ countText }}
+            </p>
 
-        <Button
-            class="absolute bottom-16 left-1/2 -translate-x-1/2"
-            :isActive="false"
-            :onClick="hardReset"
+            <div class="flex flex-row gap-4 items-center w-full">
+                <Button
+                    class="w-full"
+                    :isActive="focusState"
+                    :onClick="handleFocusButtonClick"
+                >
+                    Focus Mode
+                </Button>
+                <Button
+                    class="w-full text-nowrap"
+                    :isActive="!focusState"
+                    :onClick="handleBreakButtonClick"
+                >
+                    Take A Break
+                </Button>
+
+                <Button class="size-12 px-1 py-1 flex-shrink-0">
+                    <img class="size-full" :src="settingsIcon" alt="settings" />
+                </Button>
+            </div>
+
+            <div
+                class="bg-white/20 backdrop-blur-md shadow-lg rounded-3xl border border-white/20 h-auto p-10 flex flex-col gap-2 items-center w-full"
+            >
+                <h1 class="font-bold text-4xl">
+                    {{ focusState ? 'Focus Mode' : 'Take a Break' }}
+                </h1>
+                <p class="text-8xl font-medium tabular-nums tracking-tight">
+                    {{ currentTime }}
+                </p>
+            </div>
+
+            <div class="flex flex-row gap-4 items-center w-full">
+                <Button
+                    :isActive="false"
+                    :onClick="timerState ? pauseTimer : startTimer"
+                    class="w-full"
+                    >{{ timerState ? 'Pause' : 'Start' }}</Button
+                >
+            </div>
+        </div>
+        <Button class="flex-shrink-0" :isActive="false" :onClick="hardReset"
             >Hard Reset</Button
         >
     </div>
 </template>
-
-<style scoped></style>

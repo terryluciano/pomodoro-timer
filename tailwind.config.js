@@ -7,18 +7,14 @@ export default {
         },
         extend: {
             colors: {
-                'main-red': '#C33149',
-                'main-white': '#F8F1FF',
-                'main-blue': '#56A3A6',
+                'main-focus': '#9C6A7B',
+                'main-white': '#F8F9FA',
+                'main-break': '#637C8E',
             },
             fontFamily: {
-                Nunito: ['Nunito', 'Arial', 'serif'],
-            },
-            boxShadow: {
-                'button-default': '0 6px rgba(64, 64, 64, 0.5)',
-                'button-active': '0 3px rgba(0, 0, 0, 0.5)',
+                Nunito: ['Nunito', 'Arial', 'sans-serif'],
             },
         },
     },
     plugins: [],
-}
+};

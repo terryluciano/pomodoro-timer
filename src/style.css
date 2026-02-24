@@ -3,9 +3,9 @@
 @tailwind utilities;
 
 :root {
-    --red: #c33149;
-    --blue: #56a3a6;
-    --white: #f8f1ff;
+    --focus: #9c6a7b;
+    --break: #637c8e;
+    --white: #f8f9fa;
 }
 
 #app {

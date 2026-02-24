@@ -1,5 +1,5 @@
 <script setup>
-import { twMerge } from 'tailwind-merge'
+import { twMerge } from 'tailwind-merge';
 
 const props = defineProps({
     class: {
@@ -11,23 +11,23 @@ const props = defineProps({
     },
     onClick: {
         type: Function,
-        required: true,
+        required: false,
     },
-})
+});
 </script>
 
 <template>
     <button
         :class="
             twMerge(
-                'h-10 px-4 rounded-lg border-2 border-solid transition-all ease-linear duration-100 shadow-button-default active:shadow-button-active active:translate-y-[3px]',
+                'h-12 px-6 rounded-full transition-all ease-out duration-200 active:scale-95 text-main-white flex items-center justify-center shadow-sm hover:shadow',
                 props.isActive
-                    ? 'bg-main-white/50 text-black/70 border-main-white/70'
-                    : 'bg-main-white/80 text-black border-main-white',
+                    ? 'bg-white/40 ring-2 ring-white/50 shadow-inner'
+                    : 'bg-white/20 hover:bg-white/30 border border-white/10',
                 props.class
             )
         "
-        @click="props.onClick"
+        @click="props?.onClick"
     >
         <span class="font-medium text-lg">
             <slot></slot>
