@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia';
+import { ref } from 'vue';
 
 const DEFAULT_WORK_TIME = 1000 * 60 * 25;
 const DEFAULT_SHORT_BREAK_TIME = 1000 * 60 * 5;

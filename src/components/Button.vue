@@ -12,6 +12,7 @@ const props = defineProps({
     onClick: {
         type: Function,
         required: false,
+        default: () => {},
     },
 });
 </script>
@@ -20,14 +21,14 @@ const props = defineProps({
     <button
         :class="
             twMerge(
-                'h-12 px-6 rounded-full transition-all ease-out duration-200 active:scale-95 text-main-white flex items-center justify-center shadow-sm hover:shadow',
+                'xs:h-12 h-10 xs:px-6 px-4 rounded-full transition-all ease-out duration-200 active:scale-95 text-main-white flex items-center justify-center shadow-sm hover:shadow',
                 props.isActive
                     ? 'bg-white/40 ring-2 ring-white/50 shadow-inner'
                     : 'bg-white/20 hover:bg-white/30 border border-white/10',
                 props.class
             )
         "
-        @click="props?.onClick"
+        @click="() => props?.onClick()"
     >
         <span class="font-medium text-lg">
             <slot></slot>
