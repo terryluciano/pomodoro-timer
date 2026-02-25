@@ -6,6 +6,7 @@ import chimeSound from '@/assets/chime.mp3';
 import clickSound from '@/assets/click.mp3';
 import settingsIcon from '@/assets/settings.svg';
 import Button from '@/components/Button.vue';
+import SettingsMenu from './components/SettingsMenu.vue';
 
 const WORK_TIME = 1000 * 60 * 25;
 const SHORT_BREAK_TIME = 1000 * 60 * 5;
@@ -18,6 +19,8 @@ const focusState = ref(true);
 
 const workCount = ref(1);
 const breakCount = ref(0);
+
+const settingsOpen = ref(false);
 
 /**
  * @type {Howl | null}
@@ -227,6 +230,10 @@ const currentTime = computed(() => {
 const countText = computed(() => {
     return `${focusState.value ? 'Focus' : 'Break'} Count: ${focusState.value ? workCount.value : breakCount.value}`;
 });
+
+const toggleSettingsOpen = () => {
+    settingsOpen.value = !settingsOpen.value;
+};
 </script>
 
 <template>
@@ -263,6 +270,7 @@ const countText = computed(() => {
 
                 <Button
                     class="xs:size-12 size-10 xs:px-1 xs:py-1 px-1 py-1 flex-shrink-0"
+                    :on-click="toggleSettingsOpen"
                 >
                     <img class="size-full" :src="settingsIcon" alt="settings" />
                 </Button>
@@ -292,4 +300,5 @@ const countText = computed(() => {
             >Hard Reset</Button
         >
     </div>
+    <SettingsMenu v-model="settingsOpen" />
 </template>
