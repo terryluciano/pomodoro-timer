@@ -39,11 +39,16 @@ const handleTimerComplete = () => {
     stopTimer();
 
     store.onTimerComplete();
+
+    if (
+        (store.focusState && store.autoStartFocus) ||
+        (!store.focusState && store.autoStartBreak)
+    ) {
+        startTimer();
+    }
 };
 
 const startTimer = () => {
-    playClick();
-
     store.onTimerStart();
 
     endTime = Date.now() + store.remainingTime;
@@ -53,9 +58,14 @@ const startTimer = () => {
     updateTimer();
 };
 
-const pauseTimer = () => {
+const handleStartPauseTimer = () => {
     playClick();
-    stopTimer();
+
+    if (store.timerState) {
+        stopTimer();
+    } else {
+        startTimer();
+    }
 };
 
 const stopTimer = () => {
@@ -198,7 +208,7 @@ onUnmounted(() => {
             <div class="flex flex-row items-center w-full">
                 <Button
                     :is-active="false"
-                    :on-click="store.timerState ? pauseTimer : startTimer"
+                    :on-click="handleStartPauseTimer"
                     class="w-full"
                     >{{ store.timerState ? 'Pause' : 'Start' }}</Button
                 >

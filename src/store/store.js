@@ -31,6 +31,10 @@ export const useStore = defineStore('store', () => {
 
     const longBreakInterval = ref(DEFAULT_LONG_BREAK_INTERVAL); // after X amount of work sessions, take a long break
 
+    const autoStartFocus = ref(false);
+    const autoStartBreak = ref(false);
+    const enableLongBreaks = ref(true);
+
     const getNewTimerDuration = () => {
         if (focusState.value) {
             return focusTimerDuration.value * MINUTE_IN_MS;
@@ -88,6 +92,8 @@ export const useStore = defineStore('store', () => {
     };
 
     const init = () => {
+        if (initialized.value) return;
+
         const storedSettings = localStorage.getItem('settings');
         if (storedSettings) {
             const settings = JSON.parse(storedSettings);
@@ -105,9 +111,9 @@ export const useStore = defineStore('store', () => {
             alarmVolume.value = settings.alarmVolume || DEFAULT_VOLUME;
             longBreakInterval.value =
                 settings.longBreakInterval || DEFAULT_LONG_BREAK_INTERVAL;
-            remainingTime.value = settings.remainingTime;
             focusCount.value = settings.focusCount || 1;
             breakCount.value = settings.breakCount || 0;
+            remainingTime.value = settings.remainingTime;
         } else {
             remainingTime.value = getNewTimerDuration();
         }
@@ -161,6 +167,10 @@ export const useStore = defineStore('store', () => {
         masterVolume,
         clickVolume,
         alarmVolume,
+
+        autoStartFocus,
+        autoStartBreak,
+        enableLongBreaks,
 
         // getters
         getNewTimerDuration,

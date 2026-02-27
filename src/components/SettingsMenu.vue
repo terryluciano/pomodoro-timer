@@ -12,6 +12,8 @@ const {
     masterVolume,
     clickVolume,
     alarmVolume,
+    autoStartFocus,
+    autoStartBreak,
 } = storeToRefs(store);
 
 const open = defineModel({ type: Boolean, required: true });
@@ -173,6 +175,7 @@ const closeSettings = () => {
                             >
                                 <input
                                     id="auto-start-focus"
+                                    v-model="autoStartFocus"
                                     name="autoStartFocus"
                                     type="checkbox"
                                     class="size-4 rounded border-white/40 bg-transparent accent-white"
@@ -188,6 +191,7 @@ const closeSettings = () => {
                             >
                                 <input
                                     id="auto-start-break"
+                                    v-model="autoStartBreak"
                                     name="autoStartBreak"
                                     type="checkbox"
                                     class="size-4 rounded border-white/40 bg-transparent accent-white"
