@@ -1,0 +1,10 @@
+export const DEFAULT_FOCUS_TIMER_DURATION = 25;
+export const DEFAULT_SHORT_BREAK_TIMER_DURATION = 5;
+export const DEFAULT_LONG_BREAK_TIMER_DURATION = 15;
+
+export const MINUTE_IN_MS = 60 * 1000;
+
+export const DEFAULT_MASTER_VOLUME = 100;
+export const DEFAULT_VOLUME = 50;
+
+export const DEFAULT_LONG_BREAK_INTERVAL = 4;

@@ -1,4 +1,13 @@
 <script setup>
+import { useStore } from '@/store/store';
+import { storeToRefs } from 'pinia';
+import DurationInput from './DurationInput.vue';
+
+const store = useStore();
+
+const { focusTimerDuration, shortBreakTimerDuration, longBreakTimerDuration } =
+    storeToRefs(store);
+
 const open = defineModel({ type: Boolean, required: true });
 
 const closeSettings = () => {
@@ -46,68 +55,41 @@ const closeSettings = () => {
                         </h3>
 
                         <div class="space-y-3">
-                            <div
-                                class="flex items-center justify-between gap-3"
-                            >
-                                <label
-                                    for="focus-duration"
-                                    class="text-sm xs:text-base text-white/90"
-                                >
-                                    Focus timer (minutes)
-                                </label>
-                                <input
-                                    id="focus-duration"
-                                    name="focusDuration"
-                                    type="number"
-                                    min="1"
-                                    max="180"
-                                    step="1"
-                                    value="25"
-                                    class="h-10 w-24 rounded-xl border border-white/25 bg-white/15 px-3 text-right text-main-white outline-none transition focus:border-white/60 focus:ring-2 focus:ring-white/25"
-                                />
-                            </div>
+                            <DurationInput
+                                id="focus-duration"
+                                v-model:model-value="focusTimerDuration"
+                                label="Focus timer (minutes)"
+                                for="focus-duration"
+                                name="focusDuration"
+                                :min="1"
+                                :max="180"
+                                :step="1"
+                                value-type="duration"
+                            />
 
-                            <div
-                                class="flex items-center justify-between gap-3"
-                            >
-                                <label
-                                    for="short-break-duration"
-                                    class="text-sm xs:text-base text-white/90"
-                                >
-                                    Short break (minutes)
-                                </label>
-                                <input
-                                    id="short-break-duration"
-                                    name="shortBreakDuration"
-                                    type="number"
-                                    min="1"
-                                    max="60"
-                                    step="1"
-                                    value="5"
-                                    class="h-10 w-24 rounded-xl border border-white/25 bg-white/15 px-3 text-right text-main-white outline-none transition focus:border-white/60 focus:ring-2 focus:ring-white/25"
-                                />
-                            </div>
+                            <DurationInput
+                                id="short-break-duration"
+                                v-model:model-value="shortBreakTimerDuration"
+                                label="Short break (minutes)"
+                                for="short-break-duration"
+                                name="shortBreakDuration"
+                                :min="1"
+                                :max="60"
+                                :step="1"
+                                value-type="duration"
+                            />
 
-                            <div
-                                class="flex items-center justify-between gap-3"
-                            >
-                                <label
-                                    for="long-break-duration"
-                                    class="text-sm xs:text-base text-white/90"
-                                >
-                                    Long break (minutes)
-                                </label>
-                                <input
-                                    id="long-break-duration"
-                                    name="longBreakDuration"
-                                    type="number"
-                                    min="1"
-                                    max="90"
-                                    step="1"
-                                    value="15"
-                                    class="h-10 w-24 rounded-xl border border-white/25 bg-white/15 px-3 text-right text-main-white outline-none transition focus:border-white/60 focus:ring-2 focus:ring-white/25"
-                                />
-                            </div>
+                            <DurationInput
+                                id="long-break-duration"
+                                v-model:model-value="longBreakTimerDuration"
+                                label="Long break (minutes)"
+                                for="long-break-duration"
+                                name="longBreakDuration"
+                                :min="1"
+                                :max="90"
+                                :step="1"
+                                value-type="duration"
+                            />
                         </div>
                     </section>
 
