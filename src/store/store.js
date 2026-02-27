@@ -11,6 +11,8 @@ import {
 } from '@/lib/constants';
 
 export const useStore = defineStore('store', () => {
+    const initialized = ref(false);
+
     const focusTimerDuration = ref(DEFAULT_FOCUS_TIMER_DURATION);
     const shortBreakTimerDuration = ref(DEFAULT_SHORT_BREAK_TIMER_DURATION);
     const longBreakTimerDuration = ref(DEFAULT_LONG_BREAK_TIMER_DURATION);
@@ -25,7 +27,7 @@ export const useStore = defineStore('store', () => {
 
     const masterVolume = ref(DEFAULT_MASTER_VOLUME);
     const clickVolume = ref(DEFAULT_VOLUME);
-    const chimeVolume = ref(DEFAULT_VOLUME);
+    const alarmVolume = ref(DEFAULT_VOLUME);
 
     const longBreakInterval = ref(DEFAULT_LONG_BREAK_INTERVAL); // after X amount of work sessions, take a long break
 
@@ -100,7 +102,7 @@ export const useStore = defineStore('store', () => {
                 DEFAULT_LONG_BREAK_TIMER_DURATION;
             masterVolume.value = settings.masterVolume || DEFAULT_MASTER_VOLUME;
             clickVolume.value = settings.clickVolume || DEFAULT_VOLUME;
-            chimeVolume.value = settings.chimeVolume || DEFAULT_VOLUME;
+            alarmVolume.value = settings.alarmVolume || DEFAULT_VOLUME;
             longBreakInterval.value =
                 settings.longBreakInterval || DEFAULT_LONG_BREAK_INTERVAL;
             remainingTime.value = settings.remainingTime;
@@ -109,6 +111,8 @@ export const useStore = defineStore('store', () => {
         } else {
             remainingTime.value = getNewTimerDuration();
         }
+
+        initialized.value = true;
     };
 
     const resetTimer = () => {
@@ -135,13 +139,15 @@ export const useStore = defineStore('store', () => {
 
         masterVolume.value = DEFAULT_MASTER_VOLUME;
         clickVolume.value = DEFAULT_VOLUME;
-        chimeVolume.value = DEFAULT_VOLUME;
+        alarmVolume.value = DEFAULT_VOLUME;
 
         longBreakInterval.value = DEFAULT_LONG_BREAK_INTERVAL;
     };
 
     return {
         // states
+        initialized,
+
         focusTimerDuration,
         shortBreakTimerDuration,
         longBreakTimerDuration,
@@ -154,7 +160,7 @@ export const useStore = defineStore('store', () => {
 
         masterVolume,
         clickVolume,
-        chimeVolume,
+        alarmVolume,
 
         // getters
         getNewTimerDuration,

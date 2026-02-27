@@ -5,9 +5,11 @@ import settingsIcon from './assets/settings.svg';
 import Button from './components/Button.vue';
 import SettingsMenu from './components/SettingsMenu.vue';
 import { useStore } from './store/store';
-import { initializeAudio, playChime, playClick } from './lib/sounds';
+import { useSound } from './composables/sounds';
 
 const store = useStore();
+
+const { playClick, playChime } = useSound();
 
 const settingsOpen = ref(false);
 
@@ -98,7 +100,9 @@ const toggleSettingsOpen = () => {
 };
 
 store.$subscribe((_, state) => {
-    localStorage.setItem('settings', JSON.stringify(state));
+    if (store.initialized) {
+        localStorage.setItem('settings', JSON.stringify(state));
+    }
 });
 
 const currentTime = computed(() => {
@@ -122,8 +126,6 @@ const countText = computed(() => {
 });
 
 onMounted(() => {
-    initializeAudio();
-
     store.init();
 
     document.addEventListener('visibilitychange', handleVisibilityChange);

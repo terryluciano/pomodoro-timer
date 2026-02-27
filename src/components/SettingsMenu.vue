@@ -1,12 +1,18 @@
 <script setup>
 import { useStore } from '@/store/store';
 import { storeToRefs } from 'pinia';
-import DurationInput from './DurationInput.vue';
+import InputField from './InputField.vue';
 
 const store = useStore();
 
-const { focusTimerDuration, shortBreakTimerDuration, longBreakTimerDuration } =
-    storeToRefs(store);
+const {
+    focusTimerDuration,
+    shortBreakTimerDuration,
+    longBreakTimerDuration,
+    masterVolume,
+    clickVolume,
+    alarmVolume,
+} = storeToRefs(store);
 
 const open = defineModel({ type: Boolean, required: true });
 
@@ -55,9 +61,9 @@ const closeSettings = () => {
                         </h3>
 
                         <div class="space-y-3">
-                            <DurationInput
+                            <InputField
                                 id="focus-duration"
-                                v-model:model-value="focusTimerDuration"
+                                v-model:model-value.number="focusTimerDuration"
                                 label="Focus timer (minutes)"
                                 for="focus-duration"
                                 name="focusDuration"
@@ -67,9 +73,11 @@ const closeSettings = () => {
                                 value-type="duration"
                             />
 
-                            <DurationInput
+                            <InputField
                                 id="short-break-duration"
-                                v-model:model-value="shortBreakTimerDuration"
+                                v-model:model-value.number="
+                                    shortBreakTimerDuration
+                                "
                                 label="Short break (minutes)"
                                 for="short-break-duration"
                                 name="shortBreakDuration"
@@ -79,9 +87,11 @@ const closeSettings = () => {
                                 value-type="duration"
                             />
 
-                            <DurationInput
+                            <InputField
                                 id="long-break-duration"
-                                v-model:model-value="longBreakTimerDuration"
+                                v-model:model-value.number="
+                                    longBreakTimerDuration
+                                "
                                 label="Long break (minutes)"
                                 for="long-break-duration"
                                 name="longBreakDuration"
@@ -99,13 +109,67 @@ const closeSettings = () => {
                         <h3
                             class="text-base font-semibold uppercase tracking-wide text-white/85"
                         >
+                            Volume
+                        </h3>
+
+                        <div class="space-y-4">
+                            <InputField
+                                id="master-volume"
+                                v-model:model-value.number="masterVolume"
+                                value-type="volume"
+                                secondary-id="master-volume-input"
+                                name="masterVolume"
+                                secondary-name="masterVolumeInput"
+                                label="Master Volume"
+                                for="master-volume"
+                                :min="0"
+                                :max="100"
+                                :step="1"
+                            />
+
+                            <InputField
+                                id="click-volume"
+                                v-model:model-value.number="clickVolume"
+                                value-type="volume"
+                                secondary-id="click-volume-input"
+                                name="clickVolume"
+                                secondary-name="clickVolumeInput"
+                                label="Click Volume"
+                                for="click-volume"
+                                :min="0"
+                                :max="100"
+                                :step="1"
+                            />
+
+                            <InputField
+                                id="alarm-volume"
+                                v-model:model-value.number="alarmVolume"
+                                value-type="volume"
+                                secondary-id="alarm-volume-input"
+                                name="alarmVolume"
+                                secondary-name="alarmVolumeInput"
+                                label="Alarm Volume"
+                                for="alarm-volume"
+                                :min="0"
+                                :max="100"
+                                :step="1"
+                            />
+                        </div>
+                    </section>
+
+                    <section
+                        class="space-y-4 rounded-2xl border border-white/20 bg-white/10 p-4 xs:p-5"
+                    >
+                        <h3
+                            class="text-base font-semibold uppercase tracking-wide text-white/85"
+                        >
                             Options
                         </h3>
 
                         <div class="space-y-3">
                             <label
                                 for="auto-start-focus"
-                                class="flex items-center gap-3 rounded-xl border border-white/10 bg-white/10 px-3 py-2.5"
+                                class="flex items-center gap-3 rounded-xl border border-white/10 bg-white/10 px-3 py-2.5 cursor-pointer"
                             >
                                 <input
                                     id="auto-start-focus"
@@ -185,129 +249,6 @@ const closeSettings = () => {
                                         >focus sessions</span
                                     >
                                 </div>
-                            </div>
-                        </div>
-                    </section>
-
-                    <section
-                        class="space-y-4 rounded-2xl border border-white/20 bg-white/10 p-4 xs:p-5"
-                    >
-                        <h3
-                            class="text-base font-semibold uppercase tracking-wide text-white/85"
-                        >
-                            Volume
-                        </h3>
-
-                        <div class="space-y-4">
-                            <div class="space-y-2">
-                                <div
-                                    class="flex items-center justify-between gap-3"
-                                >
-                                    <label
-                                        for="master-volume"
-                                        class="text-sm xs:text-base text-white/90"
-                                    >
-                                        Master volume
-                                    </label>
-                                    <div class="flex items-center gap-1.5">
-                                        <input
-                                            id="master-volume-input"
-                                            name="masterVolumeInput"
-                                            type="number"
-                                            min="0"
-                                            max="100"
-                                            step="1"
-                                            value="100"
-                                            class="h-9 w-16 rounded-lg border border-white/25 bg-white/15 px-2 text-right text-main-white outline-none transition focus:border-white/60 focus:ring-2 focus:ring-white/25"
-                                        />
-                                        <span class="text-sm text-white/75"
-                                            >%</span
-                                        >
-                                    </div>
-                                </div>
-                                <input
-                                    id="master-volume"
-                                    name="masterVolume"
-                                    type="range"
-                                    min="0"
-                                    max="100"
-                                    value="100"
-                                    class="h-2 w-full cursor-pointer rounded-full bg-white/30 accent-white"
-                                />
-                            </div>
-
-                            <div class="space-y-2">
-                                <div
-                                    class="flex items-center justify-between gap-3"
-                                >
-                                    <label
-                                        for="click-volume"
-                                        class="text-sm xs:text-base text-white/90"
-                                    >
-                                        Click volume
-                                    </label>
-                                    <div class="flex items-center gap-1.5">
-                                        <input
-                                            id="click-volume-input"
-                                            name="clickVolumeInput"
-                                            type="number"
-                                            min="0"
-                                            max="100"
-                                            step="1"
-                                            value="50"
-                                            class="h-9 w-16 rounded-lg border border-white/25 bg-white/15 px-2 text-right text-main-white outline-none transition focus:border-white/60 focus:ring-2 focus:ring-white/25"
-                                        />
-                                        <span class="text-sm text-white/75"
-                                            >%</span
-                                        >
-                                    </div>
-                                </div>
-                                <input
-                                    id="click-volume"
-                                    name="clickVolume"
-                                    type="range"
-                                    min="0"
-                                    max="100"
-                                    value="50"
-                                    class="h-2 w-full cursor-pointer rounded-full bg-white/30 accent-white"
-                                />
-                            </div>
-
-                            <div class="space-y-2">
-                                <div
-                                    class="flex items-center justify-between gap-3"
-                                >
-                                    <label
-                                        for="alert-volume"
-                                        class="text-sm xs:text-base text-white/90"
-                                    >
-                                        Alert / alarm volume
-                                    </label>
-                                    <div class="flex items-center gap-1.5">
-                                        <input
-                                            id="alert-volume-input"
-                                            name="alertVolumeInput"
-                                            type="number"
-                                            min="0"
-                                            max="100"
-                                            step="1"
-                                            value="50"
-                                            class="h-9 w-16 rounded-lg border border-white/25 bg-white/15 px-2 text-right text-main-white outline-none transition focus:border-white/60 focus:ring-2 focus:ring-white/25"
-                                        />
-                                        <span class="text-sm text-white/75"
-                                            >%</span
-                                        >
-                                    </div>
-                                </div>
-                                <input
-                                    id="alert-volume"
-                                    name="alertVolume"
-                                    type="range"
-                                    min="0"
-                                    max="100"
-                                    value="50"
-                                    class="h-2 w-full cursor-pointer rounded-full bg-white/30 accent-white"
-                                />
                             </div>
                         </div>
                     </section>
