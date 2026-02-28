@@ -99,20 +99,27 @@ export const useStore = defineStore('store', () => {
             const settings = JSON.parse(storedSettings);
 
             focusTimerDuration.value =
-                settings.focusTimerDuration || DEFAULT_FOCUS_TIMER_DURATION;
+                settings.focusTimerDuration ?? DEFAULT_FOCUS_TIMER_DURATION;
             shortBreakTimerDuration.value =
-                settings.shortBreakTimerDuration ||
+                settings.shortBreakTimerDuration ??
                 DEFAULT_SHORT_BREAK_TIMER_DURATION;
             longBreakTimerDuration.value =
-                settings.longBreakTimerDuration ||
+                settings.longBreakTimerDuration ??
                 DEFAULT_LONG_BREAK_TIMER_DURATION;
-            masterVolume.value = settings.masterVolume || DEFAULT_MASTER_VOLUME;
-            clickVolume.value = settings.clickVolume || DEFAULT_VOLUME;
-            alarmVolume.value = settings.alarmVolume || DEFAULT_VOLUME;
+            masterVolume.value = settings.masterVolume ?? DEFAULT_MASTER_VOLUME;
+            clickVolume.value = settings.clickVolume ?? DEFAULT_VOLUME;
+            alarmVolume.value = settings.alarmVolume ?? DEFAULT_VOLUME;
+
+            focusCount.value = settings.focusCount ?? 1;
+            breakCount.value = settings.breakCount ?? 0;
+
+            autoStartFocus.value = settings.autoStartFocus ?? false;
+            autoStartBreak.value = settings.autoStartBreak ?? false;
+            enableLongBreaks.value = settings.enableLongBreaks ?? true;
+
             longBreakInterval.value =
-                settings.longBreakInterval || DEFAULT_LONG_BREAK_INTERVAL;
-            focusCount.value = settings.focusCount || 1;
-            breakCount.value = settings.breakCount || 0;
+                settings.longBreakInterval ?? DEFAULT_LONG_BREAK_INTERVAL;
+
             remainingTime.value = settings.remainingTime;
         } else {
             remainingTime.value = getNewTimerDuration();
@@ -171,6 +178,8 @@ export const useStore = defineStore('store', () => {
         autoStartFocus,
         autoStartBreak,
         enableLongBreaks,
+
+        longBreakInterval,
 
         // getters
         getNewTimerDuration,

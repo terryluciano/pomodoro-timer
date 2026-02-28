@@ -25,8 +25,8 @@ let endTime;
 const updateTimer = () => {
     if (!endTime || !store.timerState) return;
 
-    const now = Date.now();
-    const newRemainingTime = Math.max(0, endTime - now);
+    const newRemainingTime = Math.max(0, endTime - Date.now());
+
     store.updateRemainingTime(newRemainingTime);
 
     if (store.remainingTime <= 0) {

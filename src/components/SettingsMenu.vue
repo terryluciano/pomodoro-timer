@@ -14,6 +14,8 @@ const {
     alarmVolume,
     autoStartFocus,
     autoStartBreak,
+    enableLongBreaks,
+    longBreakInterval,
 } = storeToRefs(store);
 
 const open = defineModel({ type: Boolean, required: true });
@@ -208,7 +210,7 @@ const closeSettings = () => {
                                     for="disable-long-breaks"
                                     class="text-sm xs:text-base text-white/90"
                                 >
-                                    Disable long breaks
+                                    Enable long breaks
                                 </label>
                                 <label
                                     for="disable-long-breaks"
@@ -216,6 +218,7 @@ const closeSettings = () => {
                                 >
                                     <input
                                         id="disable-long-breaks"
+                                        v-model="enableLongBreaks"
                                         name="disableLongBreaks"
                                         type="checkbox"
                                         class="peer sr-only"
@@ -241,12 +244,12 @@ const closeSettings = () => {
                                 <div class="flex items-center gap-2">
                                     <input
                                         id="long-break-every"
+                                        v-model.number="longBreakInterval"
                                         name="longBreakEvery"
                                         type="number"
                                         min="1"
-                                        max="12"
+                                        max="100"
                                         step="1"
-                                        value="4"
                                         class="h-9 w-16 rounded-lg border border-white/25 bg-white/15 px-2 text-right text-main-white outline-none transition focus:border-white/60 focus:ring-2 focus:ring-white/25"
                                     />
                                     <span class="text-sm text-white/75"
