@@ -1,8 +1,10 @@
-# PomoTime
+# PomoDoMore
 
 ### A Simple Pomodoro Timer
 
-I created this project to practice Vue.js and run the app locally on my network for convenient access from anywhere. I also used this opportunity to learn Docker, enabling me to deploy the app on a mini Intel NUC. At the time of publishing, I plan to add multiple apps to run on my Intel NUC.
+Originally I created this project to practice Vue.js and run the app locally on my network for convenient access from anywhere. I also used this opportunity to learn Docker, enabling me to deploy the app on a mini Intel NUC. Now it's available online for everyone to use.
+
+**Try it out:** [pomodomore.com](https://pomodomore.com/)
 
 ---
 
@@ -123,5 +125,5 @@ npm run format
 Lint with ESLint:
 
 ```bash
-npx eslint .
+npm run lint
 ```
