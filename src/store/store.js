@@ -98,6 +98,8 @@ export const useStore = defineStore('store', () => {
         if (storedSettings) {
             const settings = JSON.parse(storedSettings);
 
+            focusState.value = settings.focusState ?? true;
+
             focusTimerDuration.value =
                 settings.focusTimerDuration ?? DEFAULT_FOCUS_TIMER_DURATION;
             shortBreakTimerDuration.value =
