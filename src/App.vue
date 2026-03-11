@@ -7,6 +7,7 @@ import SettingsMenu from './components/SettingsMenu.vue';
 import { useStore } from './store/store';
 import { useSound } from './composables/sounds';
 import Footer from './components/Footer.vue';
+import Header from './components/Header.vue';
 
 const store = useStore();
 
@@ -152,13 +153,17 @@ onUnmounted(() => {
     <div
         :class="
             twMerge(
-                'relative size-full flex flex-col justify-center items-center  px-0 text-main-white font-Nunito transition-all duration-[0.75s] ease-in-out xs:gap-4 gap-3 pt-10 xs:pt-16',
+                'relative size-full flex flex-col justify-center items-center  px-0 text-main-white font-Nunito transition-all duration-[0.75s] ease-in-out xs:gap-4 gap-3',
                 store.focusState ? 'bg-main-focus' : 'bg-main-break'
             )
         "
     >
+        <Header
+            :toggle-settings-open="toggleSettingsOpen"
+            :open-to-do="() => {}"
+        />
         <div
-            class="relative flex flex-col xs:justify-center items-center max-w-96 xs:gap-4 gap-3 h-full xs:mx-0 mx-4"
+            class="relative flex flex-col justify-center items-center max-w-96 xs:gap-4 gap-3 h-full xs:mx-0 mx-4"
         >
             <p class="text-white/80 font-semibold text-lg">
                 {{ countText }}
