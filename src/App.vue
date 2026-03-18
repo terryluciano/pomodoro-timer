@@ -153,7 +153,7 @@ onUnmounted(() => {
     <div
         :class="
             twMerge(
-                'relative size-full flex flex-col justify-center items-center  px-0 text-main-white font-Nunito transition-all duration-[0.75s] ease-in-out xs:gap-4 gap-3',
+                'relative size-full flex flex-col justify-center items-center  px-0 text-main-white font-Nunito transition-all duration-[0.75s] ease-in-out',
                 store.focusState ? 'bg-main-focus' : 'bg-main-break'
             )
         "
@@ -163,66 +163,78 @@ onUnmounted(() => {
             :open-to-do="() => {}"
         />
         <div
-            class="relative flex flex-col justify-center items-center max-w-96 xs:gap-4 gap-3 h-full xs:mx-0 mx-4"
+            class="flex flex-col size-full justify-center items-center xs:pb-4 pb-3"
         >
-            <p class="text-white/80 font-semibold text-lg">
-                {{ countText }}
-            </p>
-
-            <div class="flex flex-row xs:gap-4 gap-3 items-center w-full">
-                <Button
-                    class="w-full text-nowrap"
-                    :is-active="store.focusState"
-                    :on-click="onFocusMode"
-                >
-                    Focus Mode
-                </Button>
-                <Button
-                    class="w-full text-nowrap"
-                    :is-active="!store.focusState"
-                    :on-click="onBreakMode"
-                >
-                    Take A Break
-                </Button>
-
-                <Button
-                    class="xs:size-12 size-10 xs:px-1 xs:py-1 px-1 py-1 flex-shrink-0"
-                    :on-click="toggleSettingsOpen"
-                >
-                    <img class="size-full" :src="settingsIcon" alt="settings" />
-                </Button>
-            </div>
-
             <div
-                class="bg-white/20 backdrop-blur-md shadow-lg rounded-3xl border border-white/20 h-56 p-10 flex flex-col gap-2 items-center justify-center w-full"
+                class="relative flex flex-col justify-center items-center max-w-96 xs:gap-4 gap-3 h-full xs:mx-0 mx-4"
             >
-                <h1 class="font-bold text-4xl">
-                    {{ store.focusState ? 'Focus Mode' : 'Take a Break' }}
-                </h1>
-                <p
-                    :class="
-                        twMerge(
-                            'text-8xl font-medium tabular-nums tracking-tight',
-                            currentTime.length > 5 ? 'text-7xl' : 'text-8xl'
-                        )
-                    "
-                >
-                    {{ currentTime }}
+                <p class="text-white/80 font-semibold text-lg">
+                    {{ countText }}
                 </p>
-            </div>
 
-            <div class="flex flex-row items-center w-full">
-                <Button
-                    :is-active="false"
-                    :on-click="handleStartPauseTimer"
-                    class="w-full"
-                    >{{ store.timerState ? 'Pause' : 'Start' }}</Button
+                <div class="flex flex-row xs:gap-4 gap-3 items-center w-full">
+                    <Button
+                        class="w-full text-nowrap"
+                        :is-active="store.focusState"
+                        :on-click="onFocusMode"
+                    >
+                        Focus Mode
+                    </Button>
+                    <Button
+                        class="w-full text-nowrap"
+                        :is-active="!store.focusState"
+                        :on-click="onBreakMode"
+                    >
+                        Take A Break
+                    </Button>
+
+                    <Button
+                        class="xs:size-12 size-10 xs:px-1 xs:py-1 px-1 py-1 flex-shrink-0"
+                        :on-click="toggleSettingsOpen"
+                    >
+                        <img
+                            class="size-full"
+                            :src="settingsIcon"
+                            alt="settings"
+                        />
+                    </Button>
+                </div>
+
+                <div
+                    class="bg-white/20 backdrop-blur-md shadow-lg rounded-3xl border border-white/20 h-56 p-10 flex flex-col gap-2 items-center justify-center w-full"
                 >
+                    <h1 class="font-bold text-4xl">
+                        {{ store.focusState ? 'Focus Mode' : 'Take a Break' }}
+                    </h1>
+                    <p
+                        :class="
+                            twMerge(
+                                'text-8xl font-medium tabular-nums tracking-tight',
+                                currentTime.length > 5 ? 'text-7xl' : 'text-8xl'
+                            )
+                        "
+                    >
+                        {{ currentTime }}
+                    </p>
+                </div>
+
+                <div class="flex flex-row items-center w-full">
+                    <Button
+                        :is-active="false"
+                        :on-click="handleStartPauseTimer"
+                        class="w-full"
+                        >{{ store.timerState ? 'Pause' : 'Start' }}</Button
+                    >
+                </div>
             </div>
+            <Button
+                class="flex-shrink-0"
+                :is-active="false"
+                :on-click="resetTimer"
+                >Reset Timer</Button
+            >
         </div>
-        <Button class="flex-shrink-0" :is-active="false" :on-click="resetTimer"
-            >Reset Timer</Button
-        >
+
         <Footer />
     </div>
 

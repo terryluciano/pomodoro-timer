@@ -21,7 +21,7 @@ const props = defineProps({
         <Button
             class="flex-shrink-0"
             size="small"
-            :on-click="props.toggleSettingsOpen"
+            :on-click="props.openToDo"
             content-class="flex flex-row justify-center items-center xs:gap-2 gap-1"
         >
             <span class="xs:text-2xl text-lg">+</span>
