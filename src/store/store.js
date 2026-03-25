@@ -8,6 +8,7 @@ import {
     DEFAULT_VOLUME,
     DEFAULT_LONG_BREAK_INTERVAL,
     MINUTE_IN_MS,
+    LOCAL_STORAGE_SETTINGS_KEY,
 } from '@/lib/constants';
 
 export const useStore = defineStore('store', () => {
@@ -94,7 +95,7 @@ export const useStore = defineStore('store', () => {
     const init = () => {
         if (initialized.value) return;
 
-        const storedSettings = localStorage.getItem('settings');
+        const storedSettings = localStorage.getItem(LOCAL_STORAGE_SETTINGS_KEY);
         if (storedSettings) {
             const settings = JSON.parse(storedSettings);
 

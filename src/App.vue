@@ -9,8 +9,14 @@ import Footer from './components/Footer.vue';
 // import Header from './components/Header.vue';
 import ToDoList from './components/ToDoList.vue';
 import settingsIcon from '@/assets/settings.svg';
+import { useTodoStore } from './store/todo.store';
+import {
+    LOCAL_STORAGE_SETTINGS_KEY,
+    LOCAL_STORAGE_TODOS_KEY,
+} from './lib/constants';
 
 const store = useStore();
+const todoStore = useTodoStore();
 
 const { playClick, playChime } = useSound();
 
@@ -115,7 +121,18 @@ const toggleSettingsOpen = () => {
 
 store.$subscribe((_, state) => {
     if (store.initialized) {
-        localStorage.setItem('settings', JSON.stringify(state));
+        // eslint-disable-next-line
+        const { initialized, ...data } = state;
+        localStorage.setItem(LOCAL_STORAGE_SETTINGS_KEY, JSON.stringify(data));
+    }
+});
+
+todoStore.$subscribe((_, state) => {
+    if (todoStore.initialized) {
+        localStorage.setItem(
+            LOCAL_STORAGE_TODOS_KEY,
+            JSON.stringify(state.todos)
+        );
     }
 });
 
@@ -141,6 +158,7 @@ const countText = computed(() => {
 
 onMounted(() => {
     store.init();
+    todoStore.init();
 
     document.addEventListener('visibilitychange', handleVisibilityChange);
 });

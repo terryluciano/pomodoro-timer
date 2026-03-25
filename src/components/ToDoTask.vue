@@ -1,6 +1,7 @@
 <script setup>
 import { useTodoStore } from '@/store/todo.store';
 import { twMerge } from 'tailwind-merge';
+import { useTemplateRef } from 'vue';
 
 const props = defineProps({
     taskId: {
@@ -18,6 +19,19 @@ const props = defineProps({
 });
 
 const todoStore = useTodoStore();
+
+const taskSpanRef = useTemplateRef('taskSpan');
+
+const editTask = () => {
+    if (!taskSpanRef.value) return;
+
+    if (taskSpanRef.value.innerText.trim() === '') {
+        taskSpanRef.value.innerText = props.label;
+        return;
+    }
+
+    todoStore.editTodo(props.taskId, taskSpanRef.value.innerText);
+};
 </script>
 
 <template>
@@ -54,14 +68,17 @@ const todoStore = useTodoStore();
 
         <!-- Task label -->
         <span
+            ref="taskSpan"
             :class="
                 twMerge(
-                    'flex-1 truncate text-sm xs:text-base transition-all duration-200',
+                    'flex-1 text-sm xs:text-base transition-all duration-200 focus:outline-none',
                     props.checked
                         ? 'text-white/40 line-through'
                         : 'text-white/90'
                 )
             "
+            contenteditable="true"
+            @blur.self="editTask"
         >
             {{ props.label }}
         </span>
