@@ -29,7 +29,7 @@ const props = defineProps({
     <button
         :class="
             twMerge(
-                'rounded-full transition-all ease-out duration-200 active:scale-95 text-main-white flex items-center justify-center shadow-sm hover:shadow',
+                'rounded-full transition-all ease-out duration-200 active:scale-95 text-main-white flex flex-row items-center justify-center shadow-sm hover:shadow',
                 props.size === 'small'
                     ? 'xs:h-10 h-8 xs:px-4 px-3'
                     : 'xs:h-12 h-10 xs:px-6 px-4',

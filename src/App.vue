@@ -14,14 +14,17 @@ import {
     LOCAL_STORAGE_SETTINGS_KEY,
     LOCAL_STORAGE_TODOS_KEY,
 } from './lib/constants';
+import { useIsDesktop } from './composables/mediaQuery';
 
 const store = useStore();
 const todoStore = useTodoStore();
 
 const { playClick, playChime } = useSound();
 
+const isDesktop = useIsDesktop();
+
 const settingsOpen = ref(false);
-const todoListOpen = ref(true);
+const todoListOpen = ref(false);
 
 /**
  * @type {number | null}
@@ -161,6 +164,10 @@ onMounted(() => {
     todoStore.init();
 
     document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    if (todoStore.todos.length > 0 && isDesktop.value) {
+        todoListOpen.value = true;
+    }
 });
 
 onUnmounted(() => {
@@ -178,12 +185,9 @@ onUnmounted(() => {
             )
         "
     >
-        <!-- <Header
-            :toggle-settings-open="toggleSettingsOpen"
-            :open-to-do="toggleToDoListOpen"
-        /> -->
-
-        <div class="flex size-full items-center justify-center flex-row">
+        <div
+            class="flex size-full items-center justify-center flex-row relative"
+        >
             <ToDoList v-model="todoListOpen" />
 
             <div

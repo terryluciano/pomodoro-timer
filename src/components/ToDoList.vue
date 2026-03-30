@@ -5,10 +5,12 @@ import { useTodoStore } from '@/store/todo.store';
 import { ref } from 'vue';
 import Button from './Button.vue';
 import chevronIcon from '@/assets/chevron.svg';
+import { useIsDesktop } from '@/composables/mediaQuery';
 
 const open = defineModel({ type: Boolean, required: true });
 
 const todoStore = useTodoStore();
+const isDesktop = useIsDesktop();
 
 const newTask = ref('');
 
@@ -27,22 +29,29 @@ const toggleOpen = () => {
     <div
         :class="
             twMerge(
-                'xs:w-auto w-full h-full flex xs:flex-row flex-col gap-0 items-center xs:relative fixed xs:z-0 z-10 backdrop-blur-md'
+                'w-auto h-full flex flex-row gap-0 items-center relative z-0',
+                !isDesktop &&
+                    'fixed top-0 left-0 w-full h-full backdrop-blur z-10 flex-col transition-all',
+                !isDesktop && !open && '-top-full translate-y-8'
             )
         "
     >
         <div
             :class="
                 twMerge(
-                    'h-full flex-shrink-0 min-w-0 transition-all duration-300 ease-in-out w-full xs:w-80',
-                    open ? 'xs:ml-0' : 'xs:-ml-80 pointer-events-none'
+                    'h-full flex-shrink-0 min-w-0 transition-all duration-300 ease-in-out w-80',
+                    isDesktop && open ? 'ml-0' : '-ml-80 pointer-events-none',
+                    !isDesktop &&
+                        'w-full h-full flex-1 ml-0 pointer-events-auto'
                 )
             "
         >
             <div
                 :class="
                     twMerge(
-                        'flex h-full w-full xs:w-80 flex-col overflow-hidden xs:border-r border-white/15 transition-opacity duration-300'
+                        'flex h-full w-80 flex-col overflow-hidden border-white/15 transition-opacity duration-300',
+
+                        isDesktop ? 'border-r' : 'w-full h-full'
                     )
                 "
             >
@@ -51,7 +60,7 @@ const toggleOpen = () => {
                     <h2
                         class="text-lg font-bold tracking-tight text-main-white"
                     >
-                        Tasks
+                        To Do List
                     </h2>
                     <p class="text-xs text-white/60">
                         Stay focused, one task at a time
@@ -113,21 +122,55 @@ const toggleOpen = () => {
                 </div>
             </div>
         </div>
-        <Button
-            :on-click="toggleOpen"
-            class="rounded-none rounded-r-full xs:px-3 px-3 shrink-0"
-            size="small"
+        <div
+            :class="
+                twMerge(
+                    'shrink-0 size-auto flex flex-col gap-0 group ',
+                    isDesktop
+                        ? 'absolute top-1/2 -translate-y-1/2 left-full'
+                        : 'w-full h-8'
+                )
+            "
         >
-            <img
+            <p
+                v-show="isDesktop"
+                class="group-hover:opacity-80 opacity-0 transition duration-200 ease-out absolute -top-16 left-1/2 -translate-x-1/2 -rotate-90 font-bold text-lg leading-none shrink-0 text-nowrap pointer-events-none"
+            >
+                To Do List
+            </p>
+            <Button
+                :on-click="toggleOpen"
                 :class="
                     twMerge(
-                        'shrink-0 size-4 transition-all duration-100 ease-in-out',
-                        open ? 'rotate-180' : ''
+                        'rounded-none rounded-r-full xs:px-2 px-2 shrink-0 w-[34px] h-10',
+                        !isDesktop &&
+                            'rounded-br-2xl rounded-bl-2xl rounded-t-none xs:w-full w-full xs:h-full h-full',
+                        !isDesktop && open && 'rounded-none'
                     )
                 "
-                :src="chevronIcon"
-            />
-        </Button>
+                size="small"
+                content-class="flex flex-row gap-2 items-center"
+            >
+                <img
+                    :class="
+                        twMerge(
+                            'shrink-0 size-4 transition-all duration-100 ease-in-out',
+                            isDesktop
+                                ? open
+                                    ? 'rotate-180'
+                                    : ''
+                                : open
+                                  ? '-rotate-90'
+                                  : 'rotate-90'
+                        )
+                    "
+                    :src="chevronIcon"
+                />
+                <span>
+                    {{ !isDesktop ? 'To Do List' : '' }}
+                </span>
+            </Button>
+        </div>
     </div>
 </template>
 
