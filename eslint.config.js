@@ -5,7 +5,7 @@ import globals from 'globals';
 import { defineConfig, globalIgnores } from 'eslint/config';
 
 export default defineConfig([
-    globalIgnores(['dist']),
+    globalIgnores(['dist/']),
     js.configs.recommended,
     ...pluginVue.configs['flat/recommended'],
     eslintConfigPrettier,

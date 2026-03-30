@@ -1,18 +1,30 @@
 <script setup>
 import { twMerge } from 'tailwind-merge';
 import { computed, onMounted, onUnmounted, ref } from 'vue';
-import settingsIcon from './assets/settings.svg';
 import Button from './components/Button.vue';
 import SettingsMenu from './components/SettingsMenu.vue';
 import { useStore } from './store/store';
 import { useSound } from './composables/sounds';
 import Footer from './components/Footer.vue';
+// import Header from './components/Header.vue';
+import ToDoList from './components/ToDoList.vue';
+import settingsIcon from '@/assets/settings.svg';
+import { useTodoStore } from './store/todo.store';
+import {
+    LOCAL_STORAGE_SETTINGS_KEY,
+    LOCAL_STORAGE_TODOS_KEY,
+} from './lib/constants';
+import { useIsDesktop } from './composables/mediaQuery';
 
 const store = useStore();
+const todoStore = useTodoStore();
 
 const { playClick, playChime } = useSound();
 
+const isDesktop = useIsDesktop();
+
 const settingsOpen = ref(false);
+const todoListOpen = ref(false);
 
 /**
  * @type {number | null}
@@ -112,7 +124,18 @@ const toggleSettingsOpen = () => {
 
 store.$subscribe((_, state) => {
     if (store.initialized) {
-        localStorage.setItem('settings', JSON.stringify(state));
+        // eslint-disable-next-line
+        const { initialized, ...data } = state;
+        localStorage.setItem(LOCAL_STORAGE_SETTINGS_KEY, JSON.stringify(data));
+    }
+});
+
+todoStore.$subscribe((_, state) => {
+    if (todoStore.initialized) {
+        localStorage.setItem(
+            LOCAL_STORAGE_TODOS_KEY,
+            JSON.stringify(state.todos)
+        );
     }
 });
 
@@ -138,8 +161,13 @@ const countText = computed(() => {
 
 onMounted(() => {
     store.init();
+    todoStore.init();
 
     document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    if (todoStore.todos.length > 0 && isDesktop.value) {
+        todoListOpen.value = true;
+    }
 });
 
 onUnmounted(() => {
@@ -152,72 +180,100 @@ onUnmounted(() => {
     <div
         :class="
             twMerge(
-                'relative size-full flex flex-col justify-center items-center  px-0 text-main-white font-Nunito transition-all duration-[0.75s] ease-in-out xs:gap-4 gap-3 pt-10 xs:pt-16',
+                'relative size-full flex flex-col justify-center items-center  px-0 text-main-white font-Nunito transition-all duration-[0.75s] ease-in-out',
                 store.focusState ? 'bg-main-focus' : 'bg-main-break'
             )
         "
     >
         <div
-            class="relative flex flex-col xs:justify-center items-center max-w-96 xs:gap-4 gap-3 h-full xs:mx-0 mx-4"
+            class="flex size-full items-center justify-center flex-row relative"
         >
-            <p class="text-white/80 font-semibold text-lg">
-                {{ countText }}
-            </p>
-
-            <div class="flex flex-row xs:gap-4 gap-3 items-center w-full">
-                <Button
-                    class="w-full text-nowrap"
-                    :is-active="store.focusState"
-                    :on-click="onFocusMode"
-                >
-                    Focus Mode
-                </Button>
-                <Button
-                    class="w-full text-nowrap"
-                    :is-active="!store.focusState"
-                    :on-click="onBreakMode"
-                >
-                    Take A Break
-                </Button>
-
-                <Button
-                    class="xs:size-12 size-10 xs:px-1 xs:py-1 px-1 py-1 flex-shrink-0"
-                    :on-click="toggleSettingsOpen"
-                >
-                    <img class="size-full" :src="settingsIcon" alt="settings" />
-                </Button>
-            </div>
+            <ToDoList v-model="todoListOpen" />
 
             <div
-                class="bg-white/20 backdrop-blur-md shadow-lg rounded-3xl border border-white/20 h-56 p-10 flex flex-col gap-2 items-center justify-center w-full"
+                :class="
+                    twMerge(
+                        'flex-col size-full justify-center items-center xs:pb-4 pb-3 xs:flex',
+                        todoListOpen ? 'hidden' : 'flex'
+                    )
+                "
             >
-                <h1 class="font-bold text-4xl">
-                    {{ store.focusState ? 'Focus Mode' : 'Take a Break' }}
-                </h1>
-                <p
-                    :class="
-                        twMerge(
-                            'text-8xl font-medium tabular-nums tracking-tight',
-                            currentTime.length > 5 ? 'text-7xl' : 'text-8xl'
-                        )
-                    "
+                <div
+                    class="relative flex flex-col justify-center items-center max-w-96 xs:gap-4 gap-3 h-full xs:mx-0 mx-4"
                 >
-                    {{ currentTime }}
-                </p>
-            </div>
+                    <p class="text-white/80 font-semibold text-lg">
+                        {{ countText }}
+                    </p>
 
-            <div class="flex flex-row items-center w-full">
+                    <div
+                        class="flex flex-row xs:gap-4 gap-3 items-center w-full"
+                    >
+                        <Button
+                            class="w-full text-nowrap"
+                            :is-active="store.focusState"
+                            :on-click="onFocusMode"
+                        >
+                            Focus Mode
+                        </Button>
+                        <Button
+                            class="w-full text-nowrap"
+                            :is-active="!store.focusState"
+                            :on-click="onBreakMode"
+                        >
+                            Take A Break
+                        </Button>
+                        <Button
+                            class="xs:size-12 size-10 xs:px-1 xs:py-1 px-1 py-1 flex-shrink-0"
+                            :on-click="toggleSettingsOpen"
+                        >
+                            <img
+                                class="size-full"
+                                :src="settingsIcon"
+                                alt="settings"
+                            />
+                        </Button>
+                    </div>
+
+                    <div
+                        class="bg-white/20 backdrop-blur-md shadow-lg rounded-3xl border border-white/20 h-56 p-10 flex flex-col gap-2 items-center justify-center w-full xs:min-w-[360px]"
+                    >
+                        <h1 class="font-bold text-4xl">
+                            {{
+                                store.focusState ? 'Focus Mode' : 'Take a Break'
+                            }}
+                        </h1>
+                        <p
+                            :class="
+                                twMerge(
+                                    'font-medium tabular-nums tracking-tight',
+                                    currentTime.length > 5
+                                        ? 'xxs:text-7xl text-6xl'
+                                        : 'xxs:text-8xl text-7xl'
+                                )
+                            "
+                        >
+                            {{ currentTime }}
+                        </p>
+                    </div>
+
+                    <div class="flex flex-row items-center w-full">
+                        <Button
+                            :is-active="false"
+                            :on-click="handleStartPauseTimer"
+                            class="w-full"
+                            >{{ store.timerState ? 'Pause' : 'Start' }}</Button
+                        >
+                    </div>
+                </div>
                 <Button
+                    class="flex-shrink-0"
                     :is-active="false"
-                    :on-click="handleStartPauseTimer"
-                    class="w-full"
-                    >{{ store.timerState ? 'Pause' : 'Start' }}</Button
+                    :on-click="resetTimer"
+                    >Reset Timer</Button
                 >
             </div>
         </div>
-        <Button class="flex-shrink-0" :is-active="false" :on-click="resetTimer"
-            >Reset Timer</Button
-        >
+
         <Footer />
     </div>
 

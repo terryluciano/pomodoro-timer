@@ -9,9 +9,11 @@
         "preview": "vite preview",
         "host": "vite --host",
         "format": "prettier --write .",
-        "lint": "eslint ."
+        "lint": "eslint src",
+        "lint:fix": "eslint src --fix"
     },
     "dependencies": {
+        "@vueuse/core": "^14.2.1",
         "howler": "^2.2.4",
         "pinia": "^3.0.4",
         "tailwind-merge": "^2.5.5",
@@ -28,6 +30,7 @@
         "postcss": "^8.4.49",
         "prettier": "^3.8.1",
         "tailwindcss": "^3.4.16",
-        "vite": "^6.0.1"
+        "vite": "^6.0.1",
+        "vue-eslint-parser": "^10.4.0"
     }
 }

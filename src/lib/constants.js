@@ -8,3 +8,6 @@ export const DEFAULT_MASTER_VOLUME = 100;
 export const DEFAULT_VOLUME = 50;
 
 export const DEFAULT_LONG_BREAK_INTERVAL = 4;
+
+export const LOCAL_STORAGE_SETTINGS_KEY = 'settings';
+export const LOCAL_STORAGE_TODOS_KEY = 'todos';
