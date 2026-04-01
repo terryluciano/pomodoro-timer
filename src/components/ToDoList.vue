@@ -20,7 +20,6 @@ const addTask = () => {
 };
 
 const toggleOpen = () => {
-    console.log('toggleOpen');
     open.value = !open.value;
 };
 </script>
@@ -32,7 +31,7 @@ const toggleOpen = () => {
                 'w-auto h-full flex flex-row gap-0 items-center relative z-0',
                 !isDesktop &&
                     'fixed top-0 left-0 w-full h-full backdrop-blur z-10 flex-col transition-all',
-                !isDesktop && !open && '-top-full translate-y-8'
+                !isDesktop && !open && '-top-full'
             )
         "
     >
@@ -42,7 +41,8 @@ const toggleOpen = () => {
                     'h-full flex-shrink-0 min-w-0 transition-all duration-300 ease-in-out w-80',
                     isDesktop && open ? 'ml-0' : '-ml-80 pointer-events-none',
                     !isDesktop &&
-                        'w-full h-full flex-1 ml-0 pointer-events-auto'
+                        'w-full h-full flex-1 ml-0 pointer-events-auto',
+                    !isDesktop && open && 'max-h-[calc(100%-32px)]'
                 )
             "
         >
@@ -79,7 +79,7 @@ const toggleOpen = () => {
                 </div>
 
                 <!-- Task list (scrollable) -->
-                <div class="flex-1 overflow-y-auto px-4 pb-4">
+                <div class="min-h-0 flex-1 w-full overflow-y-auto px-4 pb-4">
                     <TransitionGroup
                         v-if="todoStore.todos.length > 0"
                         name="list"
@@ -188,5 +188,14 @@ const toggleOpen = () => {
 
 .list-leave-active {
     position: absolute;
+}
+
+::-webkit-scrollbar {
+    display: none;
+}
+
+* {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
 }
 </style>

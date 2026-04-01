@@ -5,7 +5,7 @@ import { useTemplateRef } from 'vue';
 
 const props = defineProps({
     taskId: {
-        type: Number,
+        type: String,
         required: true,
     },
     label: {
@@ -36,14 +36,14 @@ const editTask = () => {
 
 <template>
     <div
-        class="group flex items-center gap-3 rounded-xl border border-white/10 bg-white/10 px-3 py-2.5 transition-colors hover:bg-white/15"
+        class="group flex items-start gap-3 rounded-xl border border-white/10 bg-white/10 px-3 py-2.5 transition-colors hover:bg-white/15"
     >
         <!-- Custom glassmorphic checkbox -->
         <button
             type="button"
             :class="
                 twMerge(
-                    'flex size-5 flex-shrink-0 items-center justify-center rounded-md border transition-all duration-200',
+                    'flex size-6 flex-shrink-0 items-center justify-center rounded-md border transition-all duration-200',
                     props.checked
                         ? 'border-white/50 bg-white/40'
                         : 'border-white/30 bg-white/10 hover:border-white/50 hover:bg-white/20'

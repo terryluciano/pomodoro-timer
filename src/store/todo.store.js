@@ -1,4 +1,4 @@
-import { LOCAL_STORAGE_TODOS_KEY } from '@/lib/constants';
+import { LOCAL_STORAGE_TODOS_KEY, CHARS } from '@/lib/constants';
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
 /**
@@ -7,7 +7,7 @@ import { ref } from 'vue';
 
 /**
  * @typedef {Object} Todo
- * @property {number} id
+ * @property {string} id
  * @property {string} label
  * @property {boolean} checked
  */
@@ -28,6 +28,19 @@ const sortTodos = (todos) => {
     return [...unchecked, ...checked];
 };
 
+/**
+ * @returns {string}
+ */
+const generateId = () => {
+    let id = '';
+
+    for (let i = 0; i < 32; i++) {
+        id += CHARS[Math.floor(Math.random() * CHARS.length)];
+    }
+
+    return id;
+};
+
 export const useTodoStore = defineStore('todo', () => {
     /**
      *
@@ -41,11 +54,15 @@ export const useTodoStore = defineStore('todo', () => {
      * @param {string} label
      */
     const addTodo = (label) => {
-        const id = todos.value.length + 1;
+        const id = generateId();
+
+        const cleanLaebl = label.trim();
+
+        if (cleanLaebl.length === 0) return;
 
         todos.value.push({
             id,
-            label,
+            label: cleanLaebl,
             checked: false,
         });
 
@@ -54,7 +71,7 @@ export const useTodoStore = defineStore('todo', () => {
 
     /**
      *
-     * @param {number} id
+     * @param {string} id
      * @param {string} label
      */
     const editTodo = (id, label) => {
@@ -76,7 +93,7 @@ export const useTodoStore = defineStore('todo', () => {
 
     /**
      *
-     * @param {number} id
+     * @param {string} id
      */
     const toggleCheckedTodo = (id) => {
         const newTodos = sortTodos(
@@ -97,7 +114,7 @@ export const useTodoStore = defineStore('todo', () => {
 
     /**
      *
-     * @param {number} id
+     * @param {string} id
      */
     const deleteTodo = (id) => {
         todos.value = todos.value.filter((todo) => todo.id !== id);

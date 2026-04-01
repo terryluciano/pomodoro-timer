@@ -186,7 +186,7 @@ onUnmounted(() => {
         "
     >
         <div
-            class="flex size-full items-center justify-center flex-row relative"
+            class="flex items-center justify-center flex-row relative w-full flex-1 min-h-0"
         >
             <ToDoList v-model="todoListOpen" />
 
