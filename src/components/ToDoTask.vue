@@ -2,6 +2,8 @@
 import { useTodoStore } from '@/store/todo.store';
 import { twMerge } from 'tailwind-merge';
 import { useTemplateRef } from 'vue';
+import CheckIcon from '@/components/icons/CheckIcon.vue';
+import CrossIcon from '@/components/icons/CrossIcon.vue';
 
 const props = defineProps({
     taskId: {
@@ -52,18 +54,7 @@ const editTask = () => {
             aria-label="Toggle task"
             @click="todoStore.toggleCheckedTodo(props.taskId)"
         >
-            <svg
-                v-if="props.checked"
-                class="size-3 text-main-white"
-                viewBox="0 0 12 12"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-            >
-                <path d="M2 6l3 3 5-5" />
-            </svg>
+            <CheckIcon v-if="props.checked" class="size-3 text-main-white" />
         </button>
 
         <!-- Task label -->
@@ -90,17 +81,7 @@ const editTask = () => {
             aria-label="Delete task"
             @click="todoStore.deleteTodo(props.taskId)"
         >
-            <svg
-                class="size-3.5"
-                viewBox="0 0 12 12"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="1.5"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-            >
-                <path d="M2 2l8 8M10 2l-8 8" />
-            </svg>
+            <CrossIcon class="size-3.5" />
         </button>
     </div>
 </template>

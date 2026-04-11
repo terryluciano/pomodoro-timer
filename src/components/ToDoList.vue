@@ -2,9 +2,11 @@
 import { twMerge } from 'tailwind-merge';
 import ToDoTask from './ToDoTask.vue';
 import { useTodoStore } from '@/store/todo.store';
-import { ref } from 'vue';
-import Button from './Button.vue';
-import chevronIcon from '@/assets/chevron.svg';
+import { ref, computed } from 'vue';
+import Button from './common/Button.vue';
+import ChevronIcon from '@/components/icons/ChevronIcon.vue';
+import SortIcon from '@/components/icons/SortIcon.vue';
+import CheckSquareIcon from '@/components/icons/CheckSquareIcon.vue';
 import { useIsDesktop } from '@/composables/mediaQuery';
 
 const open = defineModel({ type: Boolean, required: true });
@@ -22,6 +24,18 @@ const addTask = () => {
 const toggleOpen = () => {
     open.value = !open.value;
 };
+
+const sections = computed(() => {
+    const active = { label: 'Active', todos: todoStore.activeTodos };
+    const completed = {
+        label: 'Completed',
+        todos: todoStore.completedTodos,
+    };
+
+    return todoStore.sortOrder === 'active-first'
+        ? [active, completed]
+        : [completed, active];
+});
 </script>
 
 <template>
@@ -80,40 +94,88 @@ const toggleOpen = () => {
 
                 <!-- Task list (scrollable) -->
                 <div class="min-h-0 flex-1 w-full overflow-y-auto px-4 pb-4">
-                    <TransitionGroup
-                        v-if="todoStore.todos.length > 0"
-                        name="list"
-                        tag="div"
-                        class="space-y-2"
-                    >
-                        <ToDoTask
-                            v-for="task in todoStore.todos"
-                            :key="task.id"
-                            :label="task.label"
-                            :checked="task.checked"
-                            :task-id="task.id"
-                        />
-                    </TransitionGroup>
+                    <template v-if="todoStore.todos.length > 0">
+                        <!-- Sort toggle -->
+                        <div class="flex items-center justify-start pb-2">
+                            <button
+                                type="button"
+                                class="flex items-center gap-1 rounded-lg py-0.5 text-[11px] text-white/40 transition-colors hover:text-white/60"
+                                aria-label="Toggle sort order"
+                                :disabled="todoStore.todos.length <= 0"
+                                @click="
+                                    () => {
+                                        if (todoStore.todos.length > 0) {
+                                            todoStore.toggleSortOrder();
+                                        }
+                                    }
+                                "
+                            >
+                                <SortIcon class="size-3" />
+                                Sort By:
+                                <span>
+                                    {{
+                                        todoStore.sortOrder === 'active-first'
+                                            ? 'Active'
+                                            : 'Completed'
+                                    }}
+                                </span>
+                            </button>
+                        </div>
+
+                        <!-- Task sections -->
+                        <template
+                            v-for="(section, index) in sections"
+                            :key="section.label"
+                        >
+                            <div
+                                v-if="section.todos.length > 0"
+                                :class="
+                                    index > 0 && sections[0].todos.length > 0
+                                        ? 'mt-4'
+                                        : ''
+                                "
+                            >
+                                <div
+                                    class="flex items-center justify-between gap-2 pb-2"
+                                >
+                                    <div
+                                        class="flex flex-row items-center gap-2"
+                                    >
+                                        <span
+                                            class="text-[11px] font-semibold uppercase tracking-wider text-white/40"
+                                        >
+                                            {{ section.label }}
+                                        </span>
+                                        <span
+                                            class="text-[11px] tabular-nums text-white/25"
+                                        >
+                                            {{ section.todos.length }}
+                                        </span>
+                                    </div>
+                                </div>
+                                <TransitionGroup
+                                    name="list"
+                                    tag="div"
+                                    class="space-y-2"
+                                >
+                                    <ToDoTask
+                                        v-for="task in section.todos"
+                                        :key="task.id"
+                                        :label="task.label"
+                                        :checked="task.checked"
+                                        :task-id="task.id"
+                                    />
+                                </TransitionGroup>
+                            </div>
+                        </template>
+                    </template>
 
                     <!-- Empty state -->
                     <div
                         v-else
                         class="flex h-full flex-col items-center justify-center gap-2 text-center"
                     >
-                        <svg
-                            class="size-10 text-white/20"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="1.5"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                        >
-                            <path d="M9 11l3 3L22 4" />
-                            <path
-                                d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"
-                            />
-                        </svg>
+                        <CheckSquareIcon class="size-10 text-white/20" />
                         <p class="text-sm text-white/40">No tasks yet</p>
                         <p class="text-xs text-white/25">
                             Add a task to get started
@@ -151,7 +213,7 @@ const toggleOpen = () => {
                 size="small"
                 content-class="flex flex-row gap-2 items-center"
             >
-                <img
+                <ChevronIcon
                     :class="
                         twMerge(
                             'shrink-0 size-4 transition-all duration-100 ease-in-out',
@@ -164,7 +226,6 @@ const toggleOpen = () => {
                                   : 'rotate-90'
                         )
                     "
-                    :src="chevronIcon"
                 />
                 <span>
                     {{ !isDesktop ? 'To Do List' : '' }}

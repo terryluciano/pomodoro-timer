@@ -1,14 +1,13 @@
 <script setup>
 import { twMerge } from 'tailwind-merge';
 import { computed, onMounted, onUnmounted, ref } from 'vue';
-import Button from './components/Button.vue';
+import Button from './components/common/Button.vue';
 import SettingsMenu from './components/SettingsMenu.vue';
 import { useStore } from './store/store';
 import { useSound } from './composables/sounds';
 import Footer from './components/Footer.vue';
-// import Header from './components/Header.vue';
 import ToDoList from './components/ToDoList.vue';
-import settingsIcon from '@/assets/settings.svg';
+import SettingsIcon from '@/components/icons/SettingsIcon.vue';
 import { useTodoStore } from './store/todo.store';
 import {
     LOCAL_STORAGE_SETTINGS_KEY,
@@ -226,11 +225,7 @@ onUnmounted(() => {
                             class="xs:size-12 size-10 xs:px-1 xs:py-1 px-1 py-1 flex-shrink-0"
                             :on-click="toggleSettingsOpen"
                         >
-                            <img
-                                class="size-full"
-                                :src="settingsIcon"
-                                alt="settings"
-                            />
+                            <SettingsIcon class="size-full text-main-white" />
                         </Button>
                     </div>
 

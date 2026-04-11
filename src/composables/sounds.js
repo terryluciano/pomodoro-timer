@@ -1,6 +1,6 @@
 import { Howl } from 'howler';
-import chimeSound from '@/assets/chime.mp3';
-import clickSound from '@/assets/click.mp3';
+import chimeSound from '@/assets/audio/chime.mp3';
+import clickSound from '@/assets/audio/click.mp3';
 import { useStore } from '@/store/store';
 
 export const useSound = () => {

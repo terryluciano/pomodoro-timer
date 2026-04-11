@@ -1,5 +1,5 @@
 <script setup>
-import githubIcon from '@/assets/github.svg';
+import GithubIcon from '@/components/icons/GithubIcon.vue';
 </script>
 
 <template>
@@ -12,8 +12,7 @@ import githubIcon from '@/assets/github.svg';
             rel="noopener noreferrer"
             class="group h-full flex items-center justify-center gap-2 flex-shrink-0 text-white/50 hover:text-white/80 transition-all duration-200"
         >
-            <img
-                :src="githubIcon"
+            <GithubIcon
                 class="xs:size-5 size-4 group-hover:opacity-80 opacity-50 transition-all duration-200"
             />
             <span class="text-sm font-medium tracking-wide">Terry Luciano</span>

@@ -1,0 +1,18 @@
+{
+    "language_servers": [
+        "eslint",
+        "vue-language-server",
+        "tailwindcss-language-server",
+        "vtsls",
+        "json-language-server"
+    ],
+    "lsp": {
+        "eslint": {
+            "settings": {
+                "codeActionOnSave": {
+                    "rules": ["import/order"]
+                }
+            }
+        }
+    }
+}

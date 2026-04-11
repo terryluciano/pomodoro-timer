@@ -1,6 +1,6 @@
 import { LOCAL_STORAGE_TODOS_KEY, CHARS } from '@/lib/constants';
 import { defineStore } from 'pinia';
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 /**
  * @import { Ref } from "vue"
  */
@@ -13,17 +13,17 @@ import { ref } from 'vue';
  */
 
 /**
+ * @typedef {'active-first' | 'completed-first'} SortOrder
+ */
+
+/**
  *
  * @param {Todo[]} todos
  * @returns {Todo[]}
  */
 const sortTodos = (todos) => {
-    const unchecked = todos
-        .filter((todo) => !todo.checked)
-        .sort((a, b) => a.label.localeCompare(b.label));
-    const checked = todos
-        .filter((todo) => todo.checked)
-        .sort((a, b) => a.label.localeCompare(b.label));
+    const unchecked = todos.filter((todo) => !todo.checked);
+    const checked = todos.filter((todo) => todo.checked);
 
     return [...unchecked, ...checked];
 };
@@ -50,6 +50,24 @@ export const useTodoStore = defineStore('todo', () => {
 
     const initialized = ref(false);
 
+    /** @type {Ref<SortOrder>} */
+    const sortOrder = ref('active-first');
+
+    const activeTodos = computed(() =>
+        todos.value.filter((todo) => !todo.checked)
+    );
+
+    const completedTodos = computed(() =>
+        todos.value.filter((todo) => todo.checked)
+    );
+
+    const toggleSortOrder = () => {
+        sortOrder.value =
+            sortOrder.value === 'active-first'
+                ? 'completed-first'
+                : 'active-first';
+    };
+
     /**
      * @param {string} label
      */
@@ -60,7 +78,7 @@ export const useTodoStore = defineStore('todo', () => {
 
         if (cleanLaebl.length === 0) return;
 
-        todos.value.push({
+        todos.value.unshift({
             id,
             label: cleanLaebl,
             checked: false,
@@ -137,11 +155,15 @@ export const useTodoStore = defineStore('todo', () => {
     return {
         todos,
         initialized,
+        sortOrder,
+        activeTodos,
+        completedTodos,
 
         init,
         addTodo,
         editTodo,
         toggleCheckedTodo,
         deleteTodo,
+        toggleSortOrder,
     };
 });
