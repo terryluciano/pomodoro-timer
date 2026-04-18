@@ -1,4 +1,4 @@
-<script setup>
+<script lang="ts" setup>
 import { useStore } from '@/store/store';
 import { watch } from 'vue';
 
@@ -42,8 +42,7 @@ const props = defineProps({
     valueType: {
         type: String,
         required: true,
-        validator: (/** @type {string} */ value) =>
-            ['duration', 'volume'].includes(value),
+        validator: (value: string) => ['duration', 'volume'].includes(value),
     },
 });
 

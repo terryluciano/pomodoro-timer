@@ -1,4 +1,4 @@
-<script setup>
+<script lang="ts" setup>
 import { useStore } from '@/store/store';
 import { storeToRefs } from 'pinia';
 import InputField from './common/InputField.vue';

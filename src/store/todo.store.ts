@@ -1,37 +1,23 @@
 import { LOCAL_STORAGE_TODOS_KEY, CHARS } from '@/lib/constants';
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
-/**
- * @import { Ref } from "vue"
- */
 
-/**
- * @typedef {Object} Todo
- * @property {string} id
- * @property {string} label
- * @property {boolean} checked
- */
+interface Todo {
+    id: string;
+    label: string;
+    checked: boolean;
+}
 
-/**
- * @typedef {'active-first' | 'completed-first'} SortOrder
- */
+type SortOrder = 'active-first' | 'completed-first';
 
-/**
- *
- * @param {Todo[]} todos
- * @returns {Todo[]}
- */
-const sortTodos = (todos) => {
+const sortTodos = (todos: Todo[]): Todo[] => {
     const unchecked = todos.filter((todo) => !todo.checked);
     const checked = todos.filter((todo) => todo.checked);
 
     return [...unchecked, ...checked];
 };
 
-/**
- * @returns {string}
- */
-const generateId = () => {
+const generateId = (): string => {
     let id = '';
 
     for (let i = 0; i < 32; i++) {
@@ -42,16 +28,11 @@ const generateId = () => {
 };
 
 export const useTodoStore = defineStore('todo', () => {
-    /**
-     *
-     * @type {Ref<Todo[]>}
-     */
-    const todos = ref([]);
+    const todos = ref<Todo[]>([]);
 
     const initialized = ref(false);
 
-    /** @type {Ref<SortOrder>} */
-    const sortOrder = ref('active-first');
+    const sortOrder = ref<SortOrder>('active-first');
 
     const activeTodos = computed(() =>
         todos.value.filter((todo) => !todo.checked)
@@ -68,10 +49,7 @@ export const useTodoStore = defineStore('todo', () => {
                 : 'active-first';
     };
 
-    /**
-     * @param {string} label
-     */
-    const addTodo = (label) => {
+    const addTodo = (label: string) => {
         const id = generateId();
 
         const cleanLaebl = label.trim();
@@ -87,12 +65,7 @@ export const useTodoStore = defineStore('todo', () => {
         todos.value = sortTodos(todos.value);
     };
 
-    /**
-     *
-     * @param {string} id
-     * @param {string} label
-     */
-    const editTodo = (id, label) => {
+    const editTodo = (id: string, label: string) => {
         const newTodos = sortTodos(
             todos.value.map((todo) => {
                 if (todo.id === id) {
@@ -109,11 +82,7 @@ export const useTodoStore = defineStore('todo', () => {
         todos.value = newTodos;
     };
 
-    /**
-     *
-     * @param {string} id
-     */
-    const toggleCheckedTodo = (id) => {
+    const toggleCheckedTodo = (id: string) => {
         const newTodos = sortTodos(
             todos.value.map((todo) => {
                 if (todo.id === id) {
@@ -130,11 +99,7 @@ export const useTodoStore = defineStore('todo', () => {
         todos.value = newTodos;
     };
 
-    /**
-     *
-     * @param {string} id
-     */
-    const deleteTodo = (id) => {
+    const deleteTodo = (id: string) => {
         todos.value = todos.value.filter((todo) => todo.id !== id);
     };
 
