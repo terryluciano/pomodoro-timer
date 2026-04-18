@@ -1,4 +1,4 @@
-<script setup>
+<script lang="ts" setup>
 import GithubIcon from '@/components/icons/GithubIcon.vue';
 </script>
 

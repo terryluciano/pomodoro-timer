@@ -1,4 +1,4 @@
-<script setup>
+<script lang="ts" setup>
 import { useTodoStore } from '@/store/todo.store';
 import { twMerge } from 'tailwind-merge';
 import { useTemplateRef } from 'vue';

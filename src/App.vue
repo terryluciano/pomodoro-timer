@@ -1,4 +1,4 @@
-<script setup>
+<script lang="ts" setup>
 import { twMerge } from 'tailwind-merge';
 import { computed, onMounted, onUnmounted, ref } from 'vue';
 import Button from './components/common/Button.vue';
@@ -25,14 +25,8 @@ const isDesktop = useIsDesktop();
 const settingsOpen = ref(false);
 const todoListOpen = ref(false);
 
-/**
- * @type {number | null}
- */
-let intervalId;
-/**
- * @type {number | null}
- */
-let endTime;
+let intervalId: number | null = null;
+let endTime: number | null = null;
 
 const updateTimer = () => {
     if (!endTime || !store.timerState) return;

@@ -6,7 +6,7 @@ cd "$(dirname "$0")/.." || exit 1
 echo "Running linting and formatting checks..."
 
 # Lint
-npm run lint
+bun run lint
 
 # Check for linting errors
 if [ $? -ne 0 ]; then
@@ -15,9 +15,9 @@ if [ $? -ne 0 ]; then
 fi
 
 # Format
-npm run format
+bun run format
 
 echo "Checks passed. Building the project..."
 
 # Build
-npm run build
+bun run build

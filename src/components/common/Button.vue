@@ -1,4 +1,4 @@
-<script setup>
+<script lang="ts" setup>
 import { twMerge } from 'tailwind-merge';
 
 const props = defineProps({

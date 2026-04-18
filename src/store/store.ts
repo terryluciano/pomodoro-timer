@@ -45,10 +45,7 @@ export const useStore = defineStore('store', () => {
             : shortBreakTimerDuration.value * MINUTE_IN_MS;
     };
 
-    /**
-     * @param {number} time
-     */
-    const updateRemainingTime = (time) => {
+    const updateRemainingTime = (time: number) => {
         remainingTime.value = time;
     };
 
