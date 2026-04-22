@@ -22,7 +22,10 @@ export function useNotifications() {
     };
 
     const notifyTimerComplete = (isFocusComplete: boolean): void => {
-        if (!('Notification' in window) || Notification.permission !== 'granted') {
+        if (
+            !('Notification' in window) ||
+            Notification.permission !== 'granted'
+        ) {
             return;
         }
 

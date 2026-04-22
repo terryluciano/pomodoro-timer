@@ -7,7 +7,7 @@ import globals from 'globals';
 import { defineConfig, globalIgnores } from 'eslint/config';
 
 export default defineConfig([
-    globalIgnores(['dist/', 'node_modules/']),
+    globalIgnores(['dist/', 'node_modules/', 'src/env.d.ts']),
     js.configs.recommended,
     ...tseslint.configs.recommended,
     ...pluginVue.configs['flat/recommended'],

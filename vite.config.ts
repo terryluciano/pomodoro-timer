@@ -11,7 +11,8 @@ export default defineConfig({
             manifest: {
                 name: 'PomoDoMore',
                 short_name: 'PomoDoMore',
-                description: 'A clean, focused Pomodoro timer to help you stay productive.',
+                description:
+                    'A clean, focused Pomodoro timer to help you stay productive.',
                 theme_color: '#ef4444',
                 background_color: '#ef4444',
                 display: 'standalone',
@@ -56,9 +57,9 @@ export default defineConfig({
                     },
                 ],
             },
-            devOptions: {
-                enabled: true,
-            }
+            // devOptions: {
+            //     enabled: true,
+            // }
         }),
     ],
     server: {
