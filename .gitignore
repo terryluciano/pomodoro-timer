@@ -26,3 +26,6 @@ dist-ssr
 # ai slop
 .prompts
 .kilo
+
+# pwa dev
+dev-dist

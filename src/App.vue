@@ -5,6 +5,7 @@ import Button from './components/common/Button.vue';
 import SettingsMenu from './components/SettingsMenu.vue';
 import { useStore } from './store/store';
 import { useSound } from './composables/sounds';
+import { useNotifications } from './composables/notifications';
 import Footer from './components/Footer.vue';
 import ToDoList from './components/ToDoList.vue';
 import SettingsIcon from '@/components/icons/SettingsIcon.vue';
@@ -19,6 +20,7 @@ const store = useStore();
 const todoStore = useTodoStore();
 
 const { playClick, playChime } = useSound();
+const { requestPermission, notifyTimerComplete } = useNotifications();
 
 const isDesktop = useIsDesktop();
 
@@ -42,6 +44,7 @@ const updateTimer = () => {
 
 const handleTimerComplete = () => {
     playChime();
+    notifyTimerComplete(store.focusState);
     stopTimer();
 
     store.onTimerComplete();
@@ -55,6 +58,10 @@ const handleTimerComplete = () => {
 };
 
 const startTimer = () => {
+    if (Notification.permission === 'default') {
+        requestPermission();
+    }
+
     store.onTimerStart();
 
     endTime = Date.now() + store.remainingTime;
