@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { useStore } from '@/store/store';
-import { watch } from 'vue';
+import { ref, watch } from 'vue';
 
 const props = defineProps({
     id: {
@@ -53,8 +53,14 @@ const value = defineModel({
     required: true,
 });
 
+const isFocused = ref(false);
+
 watch(value, () => {
-    if (!store.timerState && props.valueType === 'duration') {
+    if (
+        !store.timerState &&
+        props.valueType === 'duration' &&
+        isFocused.value
+    ) {
         store.updateRemainingTime(store.getNewTimerDuration());
         store.clearPresetSelection();
     }
@@ -78,6 +84,8 @@ watch(value, () => {
             :max="props.max"
             :step="props.step"
             class="h-10 w-24 rounded-xl border border-white/25 bg-white/15 px-3 text-right text-main-white outline-none transition focus:border-white/60 focus:ring-2 focus:ring-white/25"
+            @focus="isFocused = true"
+            @blur="isFocused = false"
         />
     </div>
 

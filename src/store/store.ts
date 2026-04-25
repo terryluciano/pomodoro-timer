@@ -94,7 +94,7 @@ export const useStore = defineStore('store', () => {
     };
 
     const applyPreset = (presetId: string) => {
-        const preset = TIMER_PRESETS.find(p => p.id === presetId);
+        const preset = TIMER_PRESETS.find((p) => p.id === presetId);
         if (!preset) return;
 
         focusTimerDuration.value = preset.focusDuration;
@@ -142,7 +142,8 @@ export const useStore = defineStore('store', () => {
             longBreakInterval.value =
                 settings.longBreakInterval ?? DEFAULT_LONG_BREAK_INTERVAL;
 
-            selectedPresetId.value = settings.selectedPresetId ?? DEFAULT_PRESET_ID;
+            selectedPresetId.value =
+                settings.selectedPresetId ?? DEFAULT_PRESET_ID;
 
             remainingTime.value = settings.remainingTime;
         } else {

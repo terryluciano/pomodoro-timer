@@ -275,3 +275,10 @@ onUnmounted(() => {
 
     <SettingsMenu v-model="settingsOpen" />
 </template>
+
+<style>
+.slightly-better-scrollbar {
+    scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+    scrollbar-width: thin;
+}
+</style>

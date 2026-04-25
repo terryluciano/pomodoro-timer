@@ -3,6 +3,7 @@ import { useStore } from '@/store/store';
 import { storeToRefs } from 'pinia';
 import InputField from './common/InputField.vue';
 import { TIMER_PRESETS } from '@/lib/constants';
+import { twMerge } from 'tailwind-merge';
 
 const store = useStore();
 
@@ -25,10 +26,6 @@ const open = defineModel({ type: Boolean, required: true });
 const closeSettings = () => {
     open.value = false;
 };
-
-const handlePresetSelect = (presetId: string) => {
-    store.applyPreset(presetId);
-};
 </script>
 
 <template>
@@ -45,7 +42,7 @@ const handlePresetSelect = (presetId: string) => {
             role="dialog"
             aria-modal="true"
             aria-label="Settings menu"
-            class="w-full xs:w-[430px] xs:h-full xs:max-h-none max-h-[92vh] overflow-y-auto rounded-t-3xl xs:rounded-none xs:rounded-l-3xl border border-white/20 bg-white/20 text-main-white backdrop-blur-md shadow-2xl transition-transform duration-300 ease-out"
+            class="w-full xs:w-[430px] xs:h-full xs:max-h-none max-h-[92vh] overflow-y-auto rounded-t-3xl xs:rounded-none xs:rounded-l-3xl border border-white/20 bg-white/20 text-main-white backdrop-blur-md shadow-2xl transition-transform duration-300 ease-out slightly-better-scrollbar"
             :class="
                 open
                     ? 'translate-y-0 xs:translate-y-0 xs:translate-x-0'
@@ -70,24 +67,29 @@ const handlePresetSelect = (presetId: string) => {
                             Presets
                         </h3>
 
-                        <div class="grid grid-cols-1 xs:grid-cols-3 gap-3">
+                        <div class="grid grid-cols-1 gap-3">
                             <button
                                 v-for="preset in TIMER_PRESETS"
                                 :key="preset.id"
                                 type="button"
-                                @click="handlePresetSelect(preset.id)"
-                                class="rounded-xl border border-white/20 bg-white/10 p-3 text-left transition hover:bg-white/20"
                                 :class="
-                                    selectedPresetId === preset.id
-                                        ? 'bg-white/40 ring-2 ring-white/50 shadow-inner'
-                                        : ''
+                                    twMerge(
+                                        'rounded-xl border border-white/20 bg-white/10 p-3 text-left transition hover:bg-white/20',
+                                        selectedPresetId === preset.id &&
+                                            'bg-white/40 ring-2 ring-white/50 shadow-inner'
+                                    )
                                 "
+                                @click="store.applyPreset(preset.id)"
                             >
-                                <div class="text-sm font-semibold text-white/90">
+                                <div
+                                    class="text-sm font-semibold text-white/90"
+                                >
                                     {{ preset.name }}
                                 </div>
                                 <div class="text-xs text-white/70 mt-1">
-                                    {{ preset.focusDuration }}m / {{ preset.shortBreakDuration }}m / {{ preset.longBreakDuration }}m
+                                    {{ preset.focusDuration }}m /
+                                    {{ preset.shortBreakDuration }}m /
+                                    {{ preset.longBreakDuration }}m
                                 </div>
                             </button>
                         </div>
@@ -275,7 +277,7 @@ const handlePresetSelect = (presetId: string) => {
                             >
                                 <label
                                     for="long-break-every"
-                                    class="text-sm xs:text-base text-white/90"
+                                    class="text-sm xs:text-base text-white/90 whitespace-nowrap"
                                 >
                                     Long break every
                                 </label>
@@ -289,8 +291,10 @@ const handlePresetSelect = (presetId: string) => {
                                         max="100"
                                         step="1"
                                         class="h-9 w-16 rounded-lg border border-white/25 bg-white/15 px-2 text-right text-main-white outline-none transition focus:border-white/60 focus:ring-2 focus:ring-white/25"
+                                        t
                                     />
-                                    <span class="text-sm text-white/75"
+                                    <span
+                                        class="text-xs text-white/75 whitespace-nowrap"
                                         >focus sessions</span
                                     >
                                 </div>
