@@ -12,6 +12,40 @@ export const DEFAULT_LONG_BREAK_INTERVAL = 4;
 export const LOCAL_STORAGE_SETTINGS_KEY = 'settings';
 export const LOCAL_STORAGE_TODOS_KEY = 'todos';
 
+export interface TimerPreset {
+    id: string;
+    name: string;
+    focusDuration: number;
+    shortBreakDuration: number;
+    longBreakDuration: number;
+}
+
+export const TIMER_PRESETS: TimerPreset[] = [
+    {
+        id: 'classic-pomodoro',
+        name: 'Classic Pomodoro',
+        focusDuration: 25,
+        shortBreakDuration: 5,
+        longBreakDuration: 15,
+    },
+    {
+        id: 'short-sprint',
+        name: 'Short Sprint',
+        focusDuration: 15,
+        shortBreakDuration: 3,
+        longBreakDuration: 10,
+    },
+    {
+        id: 'deep-work',
+        name: 'Deep Work',
+        focusDuration: 50,
+        shortBreakDuration: 10,
+        longBreakDuration: 20,
+    },
+];
+
+export const DEFAULT_PRESET_ID = 'classic-pomodoro';
+
 export const CHARS = [
     'A',
     'B',

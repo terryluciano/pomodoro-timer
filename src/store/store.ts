@@ -9,6 +9,8 @@ import {
     DEFAULT_LONG_BREAK_INTERVAL,
     MINUTE_IN_MS,
     LOCAL_STORAGE_SETTINGS_KEY,
+    TIMER_PRESETS,
+    DEFAULT_PRESET_ID,
 } from '@/lib/constants';
 
 export const useStore = defineStore('store', () => {
@@ -35,6 +37,8 @@ export const useStore = defineStore('store', () => {
     const autoStartFocus = ref(false);
     const autoStartBreak = ref(false);
     const enableLongBreaks = ref(true);
+
+    const selectedPresetId = ref<string | null>(DEFAULT_PRESET_ID);
 
     const getNewTimerDuration = () => {
         if (focusState.value) {
@@ -89,6 +93,24 @@ export const useStore = defineStore('store', () => {
         }
     };
 
+    const applyPreset = (presetId: string) => {
+        const preset = TIMER_PRESETS.find((p) => p.id === presetId);
+        if (!preset) return;
+
+        focusTimerDuration.value = preset.focusDuration;
+        shortBreakTimerDuration.value = preset.shortBreakDuration;
+        longBreakTimerDuration.value = preset.longBreakDuration;
+        selectedPresetId.value = presetId;
+
+        if (!timerState.value) {
+            remainingTime.value = getNewTimerDuration();
+        }
+    };
+
+    const clearPresetSelection = () => {
+        selectedPresetId.value = null;
+    };
+
     const init = () => {
         if (initialized.value) return;
 
@@ -119,6 +141,9 @@ export const useStore = defineStore('store', () => {
 
             longBreakInterval.value =
                 settings.longBreakInterval ?? DEFAULT_LONG_BREAK_INTERVAL;
+
+            selectedPresetId.value =
+                settings.selectedPresetId ?? DEFAULT_PRESET_ID;
 
             remainingTime.value = settings.remainingTime;
         } else {
@@ -155,6 +180,7 @@ export const useStore = defineStore('store', () => {
         alarmVolume.value = DEFAULT_VOLUME;
 
         longBreakInterval.value = DEFAULT_LONG_BREAK_INTERVAL;
+        selectedPresetId.value = DEFAULT_PRESET_ID;
     };
 
     return {
@@ -181,6 +207,8 @@ export const useStore = defineStore('store', () => {
 
         longBreakInterval,
 
+        selectedPresetId,
+
         // getters
         getNewTimerDuration,
 
@@ -194,6 +222,8 @@ export const useStore = defineStore('store', () => {
         onTimerStop,
         onFocusMode,
         onBreakMode,
+        applyPreset,
+        clearPresetSelection,
 
         // other
         $reset,

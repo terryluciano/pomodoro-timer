@@ -15,6 +15,9 @@ export default {
             fontFamily: {
                 Nunito: ['Nunito', 'Arial', 'sans-serif'],
             },
+            fontSize: {
+                xxs: '0.625rem',
+            },
         },
     },
     plugins: [],
