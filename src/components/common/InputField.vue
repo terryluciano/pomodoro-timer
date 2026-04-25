@@ -56,6 +56,7 @@ const value = defineModel({
 watch(value, () => {
     if (!store.timerState && props.valueType === 'duration') {
         store.updateRemainingTime(store.getNewTimerDuration());
+        store.clearPresetSelection();
     }
 });
 </script>
