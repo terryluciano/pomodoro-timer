@@ -8,6 +8,7 @@ import { useSound } from './composables/sounds';
 import { useNotifications } from './composables/notifications';
 import Footer from './components/Footer.vue';
 import ToDoList from './components/ToDoList.vue';
+import ProgressDots from './components/ProgressDots.vue';
 import SettingsIcon from '@/components/icons/SettingsIcon.vue';
 import { useTodoStore } from './store/todo.store';
 import {
@@ -155,10 +156,6 @@ const currentTime = computed(() => {
     return formattedTime;
 });
 
-const countText = computed(() => {
-    return `${store.focusState ? 'Focus' : 'Break'} Count: ${store.focusState ? store.focusCount : store.breakCount}`;
-});
-
 onMounted(() => {
     store.init();
     todoStore.init();
@@ -201,10 +198,6 @@ onUnmounted(() => {
                 <div
                     class="relative flex flex-col justify-center items-center max-w-96 xs:gap-4 gap-3 h-full xs:mx-0 mx-4"
                 >
-                    <p class="text-white/80 font-semibold text-lg">
-                        {{ countText }}
-                    </p>
-
                     <div
                         class="flex flex-row xs:gap-4 gap-3 items-center w-full"
                     >
@@ -251,6 +244,8 @@ onUnmounted(() => {
                             {{ currentTime }}
                         </p>
                     </div>
+
+                    <ProgressDots />
 
                     <div class="flex flex-row items-center w-full">
                         <Button
