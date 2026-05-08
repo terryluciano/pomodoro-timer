@@ -52,13 +52,13 @@ export const useTodoStore = defineStore('todo', () => {
     const addTodo = (label: string) => {
         const id = generateId();
 
-        const cleanLaebl = label.trim();
+        const cleanLabel = label.trim();
 
-        if (cleanLaebl.length === 0) return;
+        if (cleanLabel.length === 0) return;
 
         todos.value.unshift({
             id,
-            label: cleanLaebl,
+            label: cleanLabel,
             checked: false,
         });
 

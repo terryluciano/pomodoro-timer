@@ -2,23 +2,33 @@ import {
     FOCUS_COMPLETE_MESSAGES,
     BREAK_COMPLETE_MESSAGES,
 } from '@/lib/notifications';
+import { useStore } from '@/store/store';
 
 function pickRandom<T>(arr: readonly T[]): T {
     return arr[Math.floor(Math.random() * arr.length)];
 }
 
 export function useNotifications() {
+    const store = useStore();
+
     const requestPermission = async (): Promise<NotificationPermission> => {
-        if (!('Notification' in window)) {
-            return 'denied';
+        if (store.askedForNotificationPermission) {
+            return Notification.permission;
+        } else {
+            if (!('Notification' in window)) {
+                return 'denied';
+            }
+            if (Notification.permission === 'granted') {
+                return 'granted';
+            }
+            if (Notification.permission === 'denied') {
+                return 'denied';
+            }
+
+            const permission = await Notification.requestPermission();
+            store.askedForNotificationPermission = true;
+            return permission;
         }
-        if (Notification.permission === 'granted') {
-            return 'granted';
-        }
-        if (Notification.permission === 'denied') {
-            return 'denied';
-        }
-        return Notification.requestPermission();
     };
 
     const notifyTimerComplete = (isFocusComplete: boolean): void => {

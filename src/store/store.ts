@@ -40,6 +40,8 @@ export const useStore = defineStore('store', () => {
 
     const selectedPresetId = ref<string | null>(DEFAULT_PRESET_ID);
 
+    const askedForNotificationPermission = ref(false);
+
     const getNewTimerDuration = () => {
         if (focusState.value) {
             return focusTimerDuration.value * MINUTE_IN_MS;
@@ -146,6 +148,9 @@ export const useStore = defineStore('store', () => {
                 settings.selectedPresetId ?? DEFAULT_PRESET_ID;
 
             remainingTime.value = settings.remainingTime;
+
+            askedForNotificationPermission.value =
+                settings.askedForNotificationPermission ?? false;
         } else {
             remainingTime.value = getNewTimerDuration();
         }
@@ -208,6 +213,8 @@ export const useStore = defineStore('store', () => {
         longBreakInterval,
 
         selectedPresetId,
+
+        askedForNotificationPermission,
 
         // getters
         getNewTimerDuration,
