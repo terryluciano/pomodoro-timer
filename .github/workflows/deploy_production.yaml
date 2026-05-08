@@ -30,7 +30,7 @@ jobs:
               run: bun run build
 
             - name: Install Wrangler CLI
-              run: bun install -g wrangler
+              run: bun add -d wrangler@latest
 
             - name: Deploy to Cloudflare Pages
               env:
