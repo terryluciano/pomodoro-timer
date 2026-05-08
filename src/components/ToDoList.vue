@@ -211,17 +211,17 @@ const sections = computed(() => {
                     )
                 "
                 size="small"
-                content-class="flex flex-row gap-2 items-center"
+                content-class="flex flex-row gap-2 items-center justify-center"
             >
                 <ChevronIcon
                     :class="
                         twMerge(
-                            'shrink-0 size-4 transition-all duration-100 ease-in-out',
+                            'size-5 shrink-0 transition-all duration-100 ease-in-out',
                             isDesktop
-                                ? open
+                                ? !open
                                     ? 'rotate-180'
                                     : ''
-                                : open
+                                : !open
                                   ? '-rotate-90'
                                   : 'rotate-90'
                         )
