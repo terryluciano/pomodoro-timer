@@ -34,6 +34,11 @@ export const useTodoStore = defineStore('todo', () => {
 
     const sortOrder = ref<SortOrder>('active-first');
 
+    const draggedTaskId = ref<string | null>(null);
+    const draggedSection = ref<'Active' | 'Completed' | null>(null);
+    const dragOverTaskId = ref<string | null>(null);
+    const dragOverPosition = ref<'top' | 'bottom' | null>(null);
+
     const activeTodos = computed(() =>
         todos.value.filter((todo) => !todo.checked)
     );
@@ -103,6 +108,43 @@ export const useTodoStore = defineStore('todo', () => {
         todos.value = todos.value.filter((todo) => todo.id !== id);
     };
 
+    const clearCompletedTodos = () => {
+        todos.value = todos.value.filter((todo) => !todo.checked);
+    };
+
+    const reorderTodos = (
+        section: 'Active' | 'Completed',
+        fromIndex: number,
+        toIndex: number
+    ) => {
+        const active = [...activeTodos.value];
+        const completed = [...completedTodos.value];
+
+        if (section === 'Active') {
+            if (
+                fromIndex < 0 ||
+                fromIndex >= active.length ||
+                toIndex < 0 ||
+                toIndex >= active.length
+            )
+                return;
+            const [movedItem] = active.splice(fromIndex, 1);
+            active.splice(toIndex, 0, movedItem);
+        } else {
+            if (
+                fromIndex < 0 ||
+                fromIndex >= completed.length ||
+                toIndex < 0 ||
+                toIndex >= completed.length
+            )
+                return;
+            const [movedItem] = completed.splice(fromIndex, 1);
+            completed.splice(toIndex, 0, movedItem);
+        }
+
+        todos.value = [...active, ...completed];
+    };
+
     const init = () => {
         if (initialized.value) return;
 
@@ -123,6 +165,10 @@ export const useTodoStore = defineStore('todo', () => {
         sortOrder,
         activeTodos,
         completedTodos,
+        draggedTaskId,
+        draggedSection,
+        dragOverTaskId,
+        dragOverPosition,
 
         init,
         addTodo,
@@ -130,5 +176,7 @@ export const useTodoStore = defineStore('todo', () => {
         toggleCheckedTodo,
         deleteTodo,
         toggleSortOrder,
+        clearCompletedTodos,
+        reorderTodos,
     };
 });
