@@ -158,9 +158,9 @@ const handleTouchStart = (
 };
 
 const handleTouchMove = (e: TouchEvent) => {
-    e.preventDefault();
     if (!draggedTaskId.value || !draggedSection.value) return;
     if (touchReorderThrottled) return;
+    e.preventDefault();
 
     const touch = e.touches[0];
     const targetElement = document.elementFromPoint(
@@ -358,11 +358,6 @@ const handleTouchEnd = () => {
                                         :name="isDragging ? '' : 'list'"
                                         tag="div"
                                         class="space-y-2"
-                                        @leave="
-                                            (e) => {
-                                                console.log(e);
-                                            }
-                                        "
                                     >
                                         <ToDoTask
                                             v-for="(

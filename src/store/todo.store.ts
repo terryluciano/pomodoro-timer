@@ -41,8 +41,6 @@ export const useTodoStore = defineStore('todo', () => {
 
     const draggedTaskId = ref<string | null>(null);
     const draggedSection = ref<'Active' | 'Completed' | null>(null);
-    const dragOverTaskId = ref<string | null>(null);
-    const dragOverPosition = ref<'top' | 'bottom' | null>(null);
 
     const activeTodos = computed(() =>
         todos.value.filter((todo) => !todo.checked)
@@ -177,8 +175,6 @@ export const useTodoStore = defineStore('todo', () => {
         completedTodos,
         draggedTaskId,
         draggedSection,
-        dragOverTaskId,
-        dragOverPosition,
 
         init,
         addTodo,
