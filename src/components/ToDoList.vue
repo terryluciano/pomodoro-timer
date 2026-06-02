@@ -158,6 +158,7 @@ const handleTouchStart = (
 };
 
 const handleTouchMove = (e: TouchEvent) => {
+    e.preventDefault();
     if (!draggedTaskId.value || !draggedSection.value) return;
     if (touchReorderThrottled) return;
 
@@ -334,7 +335,7 @@ const handleTouchEnd = () => {
                                                 </span>
                                             </div>
                                             <Button
-                                                v-show="
+                                                v-if="
                                                     section.label ===
                                                     'Completed'
                                                 "
@@ -357,6 +358,11 @@ const handleTouchEnd = () => {
                                         :name="isDragging ? '' : 'list'"
                                         tag="div"
                                         class="space-y-2"
+                                        @leave="
+                                            (e) => {
+                                                console.log(e);
+                                            }
+                                        "
                                     >
                                         <ToDoTask
                                             v-for="(

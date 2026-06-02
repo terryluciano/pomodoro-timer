@@ -10,11 +10,16 @@ interface Todo {
 
 type SortOrder = 'active-first' | 'completed-first';
 
-const sortTodos = (todos: Todo[]): Todo[] => {
+const sortTodos = (
+    todos: Todo[],
+    sortOrder: SortOrder = 'active-first'
+): Todo[] => {
     const unchecked = todos.filter((todo) => !todo.checked);
     const checked = todos.filter((todo) => todo.checked);
 
-    return [...unchecked, ...checked];
+    return sortOrder === 'active-first'
+        ? [...unchecked, ...checked]
+        : [...checked, ...unchecked];
 };
 
 const generateId = (): string => {
@@ -67,7 +72,7 @@ export const useTodoStore = defineStore('todo', () => {
             checked: false,
         });
 
-        todos.value = sortTodos(todos.value);
+        todos.value = sortTodos(todos.value, sortOrder.value);
     };
 
     const editTodo = (id: string, label: string) => {
@@ -81,7 +86,8 @@ export const useTodoStore = defineStore('todo', () => {
                 }
 
                 return todo;
-            })
+            }),
+            sortOrder.value
         );
 
         todos.value = newTodos;
@@ -98,7 +104,8 @@ export const useTodoStore = defineStore('todo', () => {
                 }
 
                 return todo;
-            })
+            }),
+            sortOrder.value
         );
 
         todos.value = newTodos;
@@ -142,7 +149,10 @@ export const useTodoStore = defineStore('todo', () => {
             completed.splice(toIndex, 0, movedItem);
         }
 
-        todos.value = [...active, ...completed];
+        todos.value =
+            sortOrder.value === 'active-first'
+                ? [...active, ...completed]
+                : [...completed, ...active];
     };
 
     const init = () => {
@@ -153,7 +163,7 @@ export const useTodoStore = defineStore('todo', () => {
         if (storedTodos) {
             const jsonTodos = JSON.parse(storedTodos) || [];
 
-            todos.value = sortTodos(jsonTodos);
+            todos.value = sortTodos(jsonTodos, sortOrder.value);
         }
 
         initialized.value = true;
