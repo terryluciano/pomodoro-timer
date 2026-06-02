@@ -10,11 +10,16 @@ interface Todo {
 
 type SortOrder = 'active-first' | 'completed-first';
 
-const sortTodos = (todos: Todo[]): Todo[] => {
+const sortTodos = (
+    todos: Todo[],
+    sortOrder: SortOrder = 'active-first'
+): Todo[] => {
     const unchecked = todos.filter((todo) => !todo.checked);
     const checked = todos.filter((todo) => todo.checked);
 
-    return [...unchecked, ...checked];
+    return sortOrder === 'active-first'
+        ? [...unchecked, ...checked]
+        : [...checked, ...unchecked];
 };
 
 const generateId = (): string => {
@@ -33,6 +38,9 @@ export const useTodoStore = defineStore('todo', () => {
     const initialized = ref(false);
 
     const sortOrder = ref<SortOrder>('active-first');
+
+    const draggedTaskId = ref<string | null>(null);
+    const draggedSection = ref<'Active' | 'Completed' | null>(null);
 
     const activeTodos = computed(() =>
         todos.value.filter((todo) => !todo.checked)
@@ -62,7 +70,7 @@ export const useTodoStore = defineStore('todo', () => {
             checked: false,
         });
 
-        todos.value = sortTodos(todos.value);
+        todos.value = sortTodos(todos.value, sortOrder.value);
     };
 
     const editTodo = (id: string, label: string) => {
@@ -76,7 +84,8 @@ export const useTodoStore = defineStore('todo', () => {
                 }
 
                 return todo;
-            })
+            }),
+            sortOrder.value
         );
 
         todos.value = newTodos;
@@ -93,7 +102,8 @@ export const useTodoStore = defineStore('todo', () => {
                 }
 
                 return todo;
-            })
+            }),
+            sortOrder.value
         );
 
         todos.value = newTodos;
@@ -101,6 +111,46 @@ export const useTodoStore = defineStore('todo', () => {
 
     const deleteTodo = (id: string) => {
         todos.value = todos.value.filter((todo) => todo.id !== id);
+    };
+
+    const clearCompletedTodos = () => {
+        todos.value = todos.value.filter((todo) => !todo.checked);
+    };
+
+    const reorderTodos = (
+        section: 'Active' | 'Completed',
+        fromIndex: number,
+        toIndex: number
+    ) => {
+        const active = [...activeTodos.value];
+        const completed = [...completedTodos.value];
+
+        if (section === 'Active') {
+            if (
+                fromIndex < 0 ||
+                fromIndex >= active.length ||
+                toIndex < 0 ||
+                toIndex >= active.length
+            )
+                return;
+            const [movedItem] = active.splice(fromIndex, 1);
+            active.splice(toIndex, 0, movedItem);
+        } else {
+            if (
+                fromIndex < 0 ||
+                fromIndex >= completed.length ||
+                toIndex < 0 ||
+                toIndex >= completed.length
+            )
+                return;
+            const [movedItem] = completed.splice(fromIndex, 1);
+            completed.splice(toIndex, 0, movedItem);
+        }
+
+        todos.value =
+            sortOrder.value === 'active-first'
+                ? [...active, ...completed]
+                : [...completed, ...active];
     };
 
     const init = () => {
@@ -111,7 +161,7 @@ export const useTodoStore = defineStore('todo', () => {
         if (storedTodos) {
             const jsonTodos = JSON.parse(storedTodos) || [];
 
-            todos.value = sortTodos(jsonTodos);
+            todos.value = sortTodos(jsonTodos, sortOrder.value);
         }
 
         initialized.value = true;
@@ -123,6 +173,8 @@ export const useTodoStore = defineStore('todo', () => {
         sortOrder,
         activeTodos,
         completedTodos,
+        draggedTaskId,
+        draggedSection,
 
         init,
         addTodo,
@@ -130,5 +182,7 @@ export const useTodoStore = defineStore('todo', () => {
         toggleCheckedTodo,
         deleteTodo,
         toggleSortOrder,
+        clearCompletedTodos,
+        reorderTodos,
     };
 });

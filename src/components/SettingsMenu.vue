@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { useStore } from '@/store/store';
 import { storeToRefs } from 'pinia';
-import InputField from './common/InputField.vue';
+import InputField from '@/components/common/InputField.vue';
 import { TIMER_PRESETS } from '@/lib/constants';
 import { twMerge } from 'tailwind-merge';
 

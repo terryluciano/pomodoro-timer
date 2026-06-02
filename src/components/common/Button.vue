@@ -1,28 +1,13 @@
 <script lang="ts" setup>
 import { twMerge } from 'tailwind-merge';
 
-const props = defineProps({
-    class: {
-        type: String,
-        default: '',
-    },
-    contentClass: {
-        type: String,
-        default: '',
-    },
-    isActive: {
-        type: Boolean,
-    },
-    onClick: {
-        type: Function,
-        required: false,
-        default: () => {},
-    },
-    size: {
-        type: String,
-        default: 'large',
-    },
-});
+const props = defineProps<{
+    class?: string;
+    contentClass?: string;
+    isActive?: boolean;
+    onClick?: () => void;
+    size?: 'small' | 'large';
+}>();
 </script>
 
 <template>
@@ -39,7 +24,7 @@ const props = defineProps({
                 props.class
             )
         "
-        @click="() => props?.onClick()"
+        @click="() => props.onClick?.()"
     >
         <div
             :class="

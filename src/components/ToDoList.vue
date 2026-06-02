@@ -3,7 +3,7 @@ import { twMerge } from 'tailwind-merge';
 import ToDoTask from './ToDoTask.vue';
 import { useTodoStore } from '@/store/todo.store';
 import { ref, computed } from 'vue';
-import Button from './common/Button.vue';
+import Button from '@/components/common/Button.vue';
 import ChevronIcon from '@/components/icons/ChevronIcon.vue';
 import SortIcon from '@/components/icons/SortIcon.vue';
 import CheckSquareIcon from '@/components/icons/CheckSquareIcon.vue';
@@ -36,6 +36,183 @@ const sections = computed(() => {
         ? [active, completed]
         : [completed, active];
 });
+
+// Drag and drop state
+const draggedTaskId = computed<string | null>({
+    get: () => todoStore.draggedTaskId,
+    set: (val) => {
+        todoStore.draggedTaskId = val;
+    },
+});
+const draggedSection = computed<'Active' | 'Completed' | null>({
+    get: () => todoStore.draggedSection,
+    set: (val) => {
+        todoStore.draggedSection = val;
+    },
+});
+
+// Track whether a drag is active to disable CSS transitions
+const isDragging = ref(false);
+
+// Throttle flag to prevent rapid-fire reorder calls
+let reorderThrottled = false;
+const REORDER_THROTTLE_MS = 50;
+
+const handleDragStart = (
+    e: DragEvent,
+    taskId: string,
+    sectionLabel: 'Active' | 'Completed'
+) => {
+    draggedTaskId.value = taskId;
+    draggedSection.value = sectionLabel;
+    isDragging.value = true;
+
+    if (e.dataTransfer) {
+        e.dataTransfer.effectAllowed = 'move';
+        e.dataTransfer.setData('text/plain', taskId);
+    }
+};
+
+const handleDragOver = (
+    e: DragEvent,
+    taskId: string,
+    sectionLabel: 'Active' | 'Completed'
+) => {
+    // Ignore if different section or same task
+    if (
+        draggedSection.value !== sectionLabel ||
+        draggedTaskId.value === taskId
+    ) {
+        return;
+    }
+    e.preventDefault();
+    if (e.dataTransfer) {
+        e.dataTransfer.dropEffect = 'move';
+    }
+
+    // Throttle reorders to prevent rapid oscillation
+    if (reorderThrottled) return;
+
+    // Midpoint detection: only swap if cursor has passed the vertical center of the target
+    const target = (e.currentTarget as HTMLElement) || null;
+    if (target) {
+        const rect = target.getBoundingClientRect();
+        const midpoint = rect.top + rect.height / 2;
+        const section = sections.value.find((s) => s.label === sectionLabel);
+        if (!section) return;
+
+        const fromIndex = section.todos.findIndex(
+            (t) => t.id === draggedTaskId.value
+        );
+        const toIndex = section.todos.findIndex((t) => t.id === taskId);
+        if (fromIndex === -1 || toIndex === -1 || fromIndex === toIndex) return;
+
+        // Only reorder if dragging downward past midpoint, or upward above midpoint
+        const movingDown = fromIndex < toIndex;
+        if (movingDown && e.clientY < midpoint) return;
+        if (!movingDown && e.clientY > midpoint) return;
+
+        reorderThrottled = true;
+        todoStore.reorderTodos(sectionLabel, fromIndex, toIndex);
+        setTimeout(() => {
+            reorderThrottled = false;
+        }, REORDER_THROTTLE_MS);
+    }
+};
+
+const handleDragLeave = (e: DragEvent) => {
+    e.preventDefault();
+};
+
+const handleDragEnd = () => {
+    draggedTaskId.value = null;
+    draggedSection.value = null;
+    // Delay re-enabling TransitionGroup so the DOM settles before
+    // Vue can detect position diffs and apply list-move transitions
+    requestAnimationFrame(() => {
+        isDragging.value = false;
+    });
+};
+
+const handleDrop = (e: DragEvent) => {
+    e.preventDefault();
+    handleDragEnd();
+};
+
+// Touch-based drag and drop
+let touchReorderThrottled = false;
+
+const handleTouchStart = (
+    e: TouchEvent,
+    taskId: string,
+    sectionLabel: 'Active' | 'Completed'
+) => {
+    const target = e.target as HTMLElement;
+    if (!target.closest('.drag-handle')) return;
+
+    draggedTaskId.value = taskId;
+    draggedSection.value = sectionLabel;
+    isDragging.value = true;
+
+    e.preventDefault();
+};
+
+const handleTouchMove = (e: TouchEvent) => {
+    if (!draggedTaskId.value || !draggedSection.value) return;
+    if (touchReorderThrottled) return;
+    e.preventDefault();
+
+    const touch = e.touches[0];
+    const targetElement = document.elementFromPoint(
+        touch.clientX,
+        touch.clientY
+    ) as HTMLElement;
+    if (!targetElement) return;
+
+    const taskCard = targetElement.closest('[draggable="true"]') as HTMLElement;
+    if (!taskCard) return;
+
+    const taskId = taskCard.getAttribute('data-task-id');
+    const sectionLabel = taskCard.getAttribute('data-section');
+
+    if (
+        taskId &&
+        sectionLabel === draggedSection.value &&
+        taskId !== draggedTaskId.value
+    ) {
+        // Midpoint check for touch
+        const rect = taskCard.getBoundingClientRect();
+        const midpoint = rect.top + rect.height / 2;
+
+        const section = sections.value.find((s) => s.label === sectionLabel);
+        if (!section) return;
+
+        const fromIndex = section.todos.findIndex(
+            (t) => t.id === draggedTaskId.value
+        );
+        const toIndex = section.todos.findIndex((t) => t.id === taskId);
+
+        if (fromIndex === -1 || toIndex === -1 || fromIndex === toIndex) return;
+
+        const movingDown = fromIndex < toIndex;
+        if (movingDown && touch.clientY < midpoint) return;
+        if (!movingDown && touch.clientY > midpoint) return;
+
+        touchReorderThrottled = true;
+        todoStore.reorderTodos(
+            sectionLabel as 'Active' | 'Completed',
+            fromIndex,
+            toIndex
+        );
+        setTimeout(() => {
+            touchReorderThrottled = false;
+        }, REORDER_THROTTLE_MS);
+    }
+};
+
+const handleTouchEnd = () => {
+    handleDragEnd();
+};
 </script>
 
 <template>
@@ -127,46 +304,108 @@ const sections = computed(() => {
                             v-for="(section, index) in sections"
                             :key="section.label"
                         >
-                            <div
-                                v-if="section.todos.length > 0"
-                                :class="
-                                    index > 0 && sections[0].todos.length > 0
-                                        ? 'mt-4'
-                                        : ''
-                                "
-                            >
+                            <Transition name="list-container">
                                 <div
-                                    class="flex items-center justify-between gap-2 pb-2"
+                                    v-if="section.todos.length > 0"
+                                    :class="
+                                        index > 0 &&
+                                        sections[0].todos.length > 0
+                                            ? 'mt-4'
+                                            : ''
+                                    "
                                 >
                                     <div
-                                        class="flex flex-row items-center gap-2"
+                                        class="flex items-center justify-between gap-2 pb-2"
                                     >
-                                        <span
-                                            class="text-[11px] font-semibold uppercase tracking-wider text-white/40"
+                                        <div
+                                            class="flex flex-row items-center gap-2 justify-between w-full"
                                         >
-                                            {{ section.label }}
-                                        </span>
-                                        <span
-                                            class="text-[11px] tabular-nums text-white/25"
-                                        >
-                                            {{ section.todos.length }}
-                                        </span>
+                                            <div
+                                                class="flex flex-row gap-2 items-center"
+                                            >
+                                                <span
+                                                    class="text-[11px] font-semibold uppercase tracking-wider text-white/40"
+                                                >
+                                                    {{ section.label }}
+                                                </span>
+                                                <span
+                                                    class="text-[11px] tabular-nums text-white/25"
+                                                >
+                                                    {{ section.todos.length }}
+                                                </span>
+                                            </div>
+                                            <Button
+                                                v-if="
+                                                    section.label ===
+                                                    'Completed'
+                                                "
+                                                size="small"
+                                                class="xs:h-8 h-6 xs:px-3 px-2"
+                                                content-class="xs:text-base text-sm"
+                                                @click="
+                                                    todoStore.clearCompletedTodos
+                                                "
+                                            >
+                                                <span
+                                                    class="text-[11px] font-semibold uppercase tracking-wider text-white/40"
+                                                >
+                                                    Clear Completed
+                                                </span>
+                                            </Button>
+                                        </div>
                                     </div>
+                                    <TransitionGroup
+                                        :name="isDragging ? '' : 'list'"
+                                        tag="div"
+                                        class="space-y-2"
+                                    >
+                                        <ToDoTask
+                                            v-for="(
+                                                task, taskIndex
+                                            ) in section.todos"
+                                            :key="task.id"
+                                            :label="task.label"
+                                            :checked="task.checked"
+                                            :task-id="task.id"
+                                            :data-task-id="task.id"
+                                            :data-section="section.label"
+                                            :data-index="taskIndex"
+                                            @dragstart="
+                                                handleDragStart(
+                                                    $event,
+                                                    task.id,
+                                                    section.label as
+                                                        | 'Active'
+                                                        | 'Completed'
+                                                )
+                                            "
+                                            @dragover="
+                                                handleDragOver(
+                                                    $event,
+                                                    task.id,
+                                                    section.label as
+                                                        | 'Active'
+                                                        | 'Completed'
+                                                )
+                                            "
+                                            @dragleave="handleDragLeave"
+                                            @dragend="handleDragEnd"
+                                            @drop="handleDrop"
+                                            @touchstart="
+                                                handleTouchStart(
+                                                    $event,
+                                                    task.id,
+                                                    section.label as
+                                                        | 'Active'
+                                                        | 'Completed'
+                                                )
+                                            "
+                                            @touchmove="handleTouchMove"
+                                            @touchend="handleTouchEnd"
+                                        />
+                                    </TransitionGroup>
                                 </div>
-                                <TransitionGroup
-                                    name="list"
-                                    tag="div"
-                                    class="space-y-2"
-                                >
-                                    <ToDoTask
-                                        v-for="task in section.todos"
-                                        :key="task.id"
-                                        :label="task.label"
-                                        :checked="task.checked"
-                                        :task-id="task.id"
-                                    />
-                                </TransitionGroup>
-                            </div>
+                            </Transition>
                         </template>
                     </template>
 
@@ -236,11 +475,15 @@ const sections = computed(() => {
 </template>
 
 <style lang="css" scoped>
-.list-move,
+.list-move {
+    transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
 .list-enter-active,
 .list-leave-active {
-    transition: all 0.25s ease;
+    transition: all 0.2s ease;
 }
+
 .list-enter-from,
 .list-leave-to {
     opacity: 0;
@@ -258,5 +501,16 @@ const sections = computed(() => {
 * {
     -ms-overflow-style: none;
     scrollbar-width: none;
+}
+
+.list-container-enter-active,
+.list-container-leave-active {
+    transition: all 0.25s ease;
+}
+
+.list-container-enter-from,
+.list-container-leave-to {
+    opacity: 0;
+    transform: scale(0.9);
 }
 </style>
