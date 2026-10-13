@@ -10,7 +10,7 @@ const pinia = createPinia();
 const app = createApp(App);
 
 console.log(
-    "Hi, I'm Terry. Thank you for checking out my Pomodoro Timer app. I built it to help you stay focused on whatever task you're working on. This app is completely free to use. Because it's a static Vue.js application, there is no backend server, and it does not collect personal data. If you'd like to see more of my work, visit my GitHub: https://github.com/terryluciano. Thanks again for stopping by!"
+	"Hey, I'm Terry. this is a Pomodoro timer I built to help you stay focused on whatever you're working on. It's completely free, and since it's a static Vue.js app with no backend, it doesn't collect any personal data. You can find more of my work on GitHub: https://github.com/terryluciano"
 );
 
 app.use(pinia);
